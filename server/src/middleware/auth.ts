@@ -3,6 +3,26 @@ import { AuthenticatedRequest } from '../types';
 import { verifyToken, extractTokenFromHeader } from '../utils/jwt';
 import prisma from '../config/database';
 
+/**
+ * Authentication middleware that validates JWT tokens and attaches user to request
+ * 
+ * @description Extracts JWT token from Authorization header, validates it, and fetches user data
+ * @param req - Express request object (will be extended with user property)
+ * @param res - Express response object
+ * @param next - Express next function
+ * 
+ * @returns 401 if:
+ * - No token provided
+ * - Invalid or expired token
+ * - User not found in database
+ * 
+ * @example
+ * ```typescript
+ * router.get('/protected', authenticateToken, (req, res) => {
+ *   const user = req.user; // User is now available
+ * });
+ * ```
+ */
 export const authenticateToken = async (
   req: AuthenticatedRequest,
   res: Response,

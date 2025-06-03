@@ -22,9 +22,9 @@ export interface GoogleProfile {
 
 export interface CreateUserData {
   email: string;
-  firstName: string;
-  lastName: string;
-  username: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
   country?: string;
   phone?: string;
   googleId?: string;
