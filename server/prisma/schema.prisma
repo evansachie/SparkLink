@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  googleId      String?   @unique
+  firstName     String
+  lastName      String
+  username      String    @unique
+  country       String?
+  phone         String?
+  profilePicture String?
+  isVerified    Boolean   @default(false)
+  subscription  SubscriptionTier @default(STARTER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  profile       Profile?
+  analytics     Analytics[]
+  
+  @@map("users")
+}
+
+model Profile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  backgroundImage String?
+  bio             String?  @db.Text
+  tagline         String?
+  countryFlag     String?
+  isPublished     Boolean  @default(false)
+  customDomain    String?  @unique
+  showPoweredBy   Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pages           Page[]
+  socialLinks     SocialLink[]
+  
+  @@map("profiles")
+}
+
+model Page {
+  id          String    @id @default(cuid())
+  profileId   String
+  type        PageType
+  title       String
+  slug        String
+  content     Json?
+  isPublished Boolean   @default(false)
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  @@unique([profileId, slug])
+  @@map("pages")
+}
+
+model SocialLink {
+  id        String   @id @default(cuid())
+  profileId String
+  platform  String
+  url       String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  
+  // Relations
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  @@map("social_links")
+}
+
+model Analytics {
+  id        String   @id @default(cuid())
+  userId    String
+  event     String
+  data      Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("analytics")
+}
+
+enum SubscriptionTier {
+  STARTER
+  RISE
+  BLAZE
+}
+
+enum PageType {
+  HOME
+  SERVICES
+  PRODUCTS
+  ABOUT
+  CONTACT
+  EVENTS
+  SKILLS
+  CERTIFICATIONS
+  EDUCATION
+  PAYMENTS
+  PROJECTS
+  GALLERY
+  WORK_EXPERIENCE
+  BOOKING
+  CUSTOM
+}
