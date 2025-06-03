@@ -10,14 +10,17 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
+  password      String?
   googleId      String?   @unique
-  firstName     String
-  lastName      String
-  username      String    @unique
+  firstName     String?
+  lastName      String?
+  username      String?   @unique
   country       String?
   phone         String?
   profilePicture String?
   isVerified    Boolean   @default(false)
+  emailVerificationToken String?
+  emailVerificationExpires DateTime?
   subscription  SubscriptionTier @default(STARTER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
