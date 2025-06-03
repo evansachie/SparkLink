@@ -29,6 +29,15 @@ app.use(passport.initialize());
 // Routes
 app.use('/api/auth', authRoutes);
 
+// Base route - API information
+app.get('/', (req, res) => {
+  res.json({
+    message: 'SparkLink API is running',
+    version: '1.0.0',
+    health: '/api/health'
+  });
+});
+
 // Basic health check route
 app.get('/api/health', async (req, res) => {
   try {
