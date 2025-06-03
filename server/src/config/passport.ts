@@ -43,12 +43,15 @@ passport.use(new GoogleStrategy({
 
     // Create new user
     if (email) {
+      const firstName = profile.name?.givenName || undefined;
+      const lastName = profile.name?.familyName || undefined;
+      
       user = await prisma.user.create({
         data: {
           email,
           googleId: profile.id,
-          firstName: profile.name?.givenName,
-          lastName: profile.name?.familyName,
+          firstName,
+          lastName,
           profilePicture: profile.photos?.[0]?.value,
           isVerified: true
         }
