@@ -13,7 +13,22 @@ export const generateOTP = (): string => {
   return crypto.randomInt(100000, 999999).toString();
 };
 
+// Helper function to escape HTML
+const escapeHtml = (text: string): string => {
+  const map: { [key: string]: string } = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return text.replace(/[&<>"']/g, (m) => map[m]);
+};
+
 export const sendVerificationEmail = async (email: string, otp: string, firstName?: string) => {
+  // Escape user input to prevent XSS
+  const safeFirstName = firstName ? escapeHtml(firstName) : '';
+  
   const mailOptions = {
     from: process.env.EMAIL_FROM!,
     to: email,
@@ -37,7 +52,7 @@ export const sendVerificationEmail = async (email: string, otp: string, firstNam
             <h1>Welcome to SparkLink!</h1>
           </div>
           <div class="content">
-            <h2>Hi ${firstName || 'there'}!</h2>
+            <h2>Hi ${safeFirstName || 'there'}!</h2>
             <p>Thanks for signing up with SparkLink. To complete your registration and verify your email address, please use the verification code below:</p>
             
             <div class="otp-code">${otp}</div>
