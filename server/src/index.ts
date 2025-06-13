@@ -7,6 +7,7 @@ import prisma from './config/database';
 import authRoutes from './routes/authRoutes';
 import profileRoutes from './routes/profileRoutes';
 import pageRoutes from './routes/pageRoutes';
+import publicRoutes from './routes/publicRoutes';
 import passport from './config/passport';
 
 // Load environment variables
@@ -32,6 +33,7 @@ app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/pages', pageRoutes);
+app.use('/api/public', publicRoutes);
 
 // Base route - API information
 app.get('/', (req, res) => {

@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { 
-  getCurrentProfile, updateUserProfile, checkUsername, 
-  updateSocialLinks, uploadProfilePicture, uploadBackgroundImage 
+  getCurrentProfile, updateUserProfile, checkUsername,
+  updateSocialLinks, uploadProfilePicture, uploadBackgroundImage,
+  toggleProfilePublication
 } from '../controllers/profileController';
 import { authenticateToken } from '../middleware/auth';
 import { upload } from '../config/cloudinary';
@@ -12,6 +13,7 @@ const router = Router();
 router.get('/', authenticateToken as any, getCurrentProfile as any);
 router.put('/', authenticateToken as any, updateUserProfile as any);
 router.put('/social-links', authenticateToken as any, updateSocialLinks as any);
+router.post('/publish', authenticateToken as any, toggleProfilePublication as any);
 
 // File upload routes
 router.post('/upload/profile-picture', 

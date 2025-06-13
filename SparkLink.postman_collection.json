@@ -476,6 +476,69 @@
           }
         }
       ]
+    },
+    {
+      "name": "Public Portfolio",
+      "item": [
+        {
+          "name": "Get Public Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/public/:username",
+              "host": ["{{base_url}}"],
+              "path": ["api", "public", ":username"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Public Pages List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/public/:username/pages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "public", ":username", "pages"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Public Page By Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/public/:username/pages/:slug",
+              "host": ["{{base_url}}"],
+              "path": ["api", "public", ":username", "pages", ":slug"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                },
+                {
+                  "key": "slug",
+                  "value": "home"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }

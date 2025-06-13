@@ -412,3 +412,92 @@ export const uploadBackgroundImage = async (req: AuthenticatedRequest, res: Resp
     });
   }
 };
+
+/**
+ * Toggle profile publication status
+ */
+export const toggleProfilePublication = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { isPublished } = req.body;
+    
+    if (!userId) {
+      return res.status(401).json({
+        status: 'ERROR',
+        message: 'User not authenticated'
+      });
+    }
+
+    if (isPublished === undefined) {
+      return res.status(400).json({
+        status: 'ERROR',
+        message: 'isPublished field is required'
+      });
+    }
+
+    // Get or create profile
+    let profile = await prisma.profile.findUnique({
+      where: { userId }
+    });
+
+    if (!profile) {
+      profile = await prisma.profile.create({
+        data: {
+          userId,
+          isPublished: false,
+          showPoweredBy: true
+        }
+      });
+    }
+
+    // If user is trying to publish, check if they have required fields
+    if (isPublished) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { username: true }
+      });
+
+      if (!user?.username) {
+        return res.status(400).json({
+          status: 'ERROR',
+          message: 'Username is required to publish your profile'
+        });
+      }
+
+      // Check if they have at least one page
+      const pagesCount = await prisma.page.count({
+        where: { profileId: profile.id }
+      });
+
+      if (pagesCount === 0) {
+        return res.status(400).json({
+          status: 'ERROR',
+          message: 'You need at least one page to publish your profile'
+        });
+      }
+    }
+
+    // Update publication status
+    profile = await prisma.profile.update({
+      where: { userId },
+      data: { isPublished }
+    });
+
+    res.json({
+      status: 'SUCCESS',
+      message: isPublished ? 'Profile published successfully' : 'Profile unpublished',
+      data: {
+        profile: {
+          id: profile.id,
+          isPublished: profile.isPublished
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Toggle publication error:', error);
+    res.status(500).json({
+      status: 'ERROR',
+      message: 'Failed to update publication status'
+    });
+  }
+};
