@@ -183,6 +183,150 @@
           }
         }
       ]
+    },
+    {
+      "name": "Profile Management",
+      "item": [
+        {
+          "name": "Get Current Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"username\": \"johndoe\",\n  \"country\": \"Ghana\",\n  \"phone\": \"+233123456789\",\n  \"bio\": \"Full-stack developer with 5 years of experience\",\n  \"tagline\": \"Building the web, one line at a time\",\n  \"countryFlag\": \"gh\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Check Username Availability",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/profile/check-username?username=johndoe",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile", "check-username"],
+              "query": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Social Links",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"links\": [\n    {\n      \"platform\": \"twitter\",\n      \"url\": \"https://twitter.com/johndoe\"\n    },\n    {\n      \"platform\": \"linkedin\",\n      \"url\": \"https://linkedin.com/in/johndoe\"\n    },\n    {\n      \"platform\": \"github\",\n      \"url\": \"https://github.com/johndoe\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/profile/social-links",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile", "social-links"]
+            }
+          }
+        },
+        {
+          "name": "Upload Profile Picture",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/profile/upload/profile-picture",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile", "upload", "profile-picture"]
+            }
+          }
+        },
+        {
+          "name": "Upload Background Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/profile/upload/background-image",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile", "upload", "background-image"]
+            }
+          }
+        }
+      ]
     }
   ]
 }

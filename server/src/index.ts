@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import prisma from './config/database';
 import authRoutes from './routes/authRoutes';
+import profileRoutes from './routes/profileRoutes';
 import passport from './config/passport';
 
 // Load environment variables
@@ -28,6 +29,7 @@ app.use(passport.initialize());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Base route - API information
 app.get('/', (req, res) => {
