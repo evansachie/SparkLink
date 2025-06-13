@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import prisma from './config/database';
 import authRoutes from './routes/authRoutes';
 import profileRoutes from './routes/profileRoutes';
+import pageRoutes from './routes/pageRoutes';
 import passport from './config/passport';
 
 // Load environment variables
@@ -30,6 +31,7 @@ app.use(passport.initialize());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/pages', pageRoutes);
 
 // Base route - API information
 app.get('/', (req, res) => {
