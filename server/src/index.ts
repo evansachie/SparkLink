@@ -5,6 +5,11 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import prisma from './config/database';
 import authRoutes from './routes/authRoutes';
+import profileRoutes from './routes/profileRoutes';
+import pageRoutes from './routes/pageRoutes';
+import publicRoutes from './routes/publicRoutes';
+import analyticsRoutes from './routes/analyticsRoutes';
+import subscriptionRoutes from './routes/subscriptionRoutes';
 import passport from './config/passport';
 
 // Load environment variables
@@ -28,6 +33,20 @@ app.use(passport.initialize());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/pages', pageRoutes);
+app.use('/api/public', publicRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+
+// Base route - API information
+app.get('/', (req, res) => {
+  res.json({
+    message: 'SparkLink API is running',
+    version: '1.0.0',
+    health: '/api/health'
+  });
+});
 
 // Basic health check route
 app.get('/api/health', async (req, res) => {

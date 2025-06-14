@@ -1,0 +1,45 @@
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import multer from 'multer';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Type declaration for CloudinaryStorage params
+interface CloudinaryStorageParams {
+  cloudinary: typeof cloudinary;
+  params: {
+    folder: string;
+    allowed_formats?: string[];
+    transformation?: Array<Record<string, any>>;
+    public_id?: (req: any, file: Express.Multer.File) => string;
+  };
+}
+
+// Configure storage with proper typing
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'sparklink',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
+    transformation: [{ width: 500, height: 500, crop: 'limit' }],
+    public_id: (req: any, file: Express.Multer.File) => {
+      const userId = req.user?.id || 'anonymous';
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      return `user-${userId}-${uniqueSuffix}`;
+    }
+  }
+} as CloudinaryStorageParams);
+
+// Create multer upload middleware
+export const upload = multer({ storage });
+
+// Export cloudinary for direct operations
+export default cloudinary;

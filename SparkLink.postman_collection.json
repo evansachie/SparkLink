@@ -183,6 +183,547 @@
           }
         }
       ]
+    },
+    {
+      "name": "Profile Management",
+      "item": [
+        {
+          "name": "Get Current Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"username\": \"johndoe\",\n  \"country\": \"Ghana\",\n  \"phone\": \"+233123456789\",\n  \"bio\": \"Full-stack developer with 5 years of experience\",\n  \"tagline\": \"Building the web, one line at a time\",\n  \"countryFlag\": \"gh\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Check Username Availability",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/profile/check-username?username=johndoe",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile", "check-username"],
+              "query": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Social Links",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"links\": [\n    {\n      \"platform\": \"twitter\",\n      \"url\": \"https://twitter.com/johndoe\"\n    },\n    {\n      \"platform\": \"linkedin\",\n      \"url\": \"https://linkedin.com/in/johndoe\"\n    },\n    {\n      \"platform\": \"github\",\n      \"url\": \"https://github.com/johndoe\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/profile/social-links",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile", "social-links"]
+            }
+          }
+        },
+        {
+          "name": "Upload Profile Picture",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/profile/upload/profile-picture",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile", "upload", "profile-picture"]
+            }
+          }
+        },
+        {
+          "name": "Upload Background Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/profile/upload/background-image",
+              "host": ["{{base_url}}"],
+              "path": ["api", "profile", "upload", "background-image"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Page Management",
+      "item": [
+        {
+          "name": "Get All Pages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages"]
+            }
+          }
+        },
+        {
+          "name": "Get Page by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pages/:pageId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages", ":pageId"],
+              "variable": [
+                {
+                  "key": "pageId",
+                  "value": "page_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Page",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"HOME\",\n  \"title\": \"Home Page\",\n  \"slug\": \"home\",\n  \"content\": {\n    \"headline\": \"Welcome to my portfolio\",\n    \"subheading\": \"Full Stack Developer\",\n    \"sections\": [\n      {\n        \"type\": \"text\",\n        \"content\": \"I build amazing web applications\"\n      }\n    ]\n  },\n  \"isPublished\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages"]
+            }
+          }
+        },
+        {
+          "name": "Update Page",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Home Page\",\n  \"content\": {\n    \"headline\": \"Welcome to my updated portfolio\",\n    \"subheading\": \"Full Stack Developer & Designer\",\n    \"sections\": [\n      {\n        \"type\": \"text\",\n        \"content\": \"I build amazing web applications with modern technologies\"\n      }\n    ]\n  },\n  \"isPublished\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pages/:pageId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages", ":pageId"],
+              "variable": [
+                {
+                  "key": "pageId",
+                  "value": "page_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Page",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pages/:pageId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages", ":pageId"],
+              "variable": [
+                {
+                  "key": "pageId",
+                  "value": "page_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reorder Pages",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pageOrders\": [\n    { \"id\": \"page_id_1\", \"order\": 0 },\n    { \"id\": \"page_id_2\", \"order\": 1 },\n    { \"id\": \"page_id_3\", \"order\": 2 }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pages/reorder",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages", "reorder"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public Portfolio",
+      "item": [
+        {
+          "name": "Get Public Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/public/:username",
+              "host": ["{{base_url}}"],
+              "path": ["api", "public", ":username"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Public Pages List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/public/:username/pages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "public", ":username", "pages"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Public Page By Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/public/:username/pages/:slug",
+              "host": ["{{base_url}}"],
+              "path": ["api", "public", ":username", "pages", ":slug"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                },
+                {
+                  "key": "slug",
+                  "value": "home"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Analytics Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analytics/summary",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analytics", "summary"]
+            },
+            "description": "Get overall analytics summary with total views and most viewed pages"
+          }
+        },
+        {
+          "name": "Get Visitor Trends",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analytics/trends?days=30",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analytics", "trends"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30",
+                  "description": "Number of days to get data for (default: 30, max: 365)"
+                }
+              ]
+            },
+            "description": "Get daily visitor trends over a specified period"
+          }
+        },
+        {
+          "name": "Get Geographic Distribution",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analytics/geo",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analytics", "geo"]
+            },
+            "description": "Get geographical distribution of visitors (currently returns sample data)"
+          }
+        },
+        {
+          "name": "Get Device Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analytics/devices",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analytics", "devices"]
+            },
+            "description": "Get device and browser statistics (currently returns sample data)"
+          }
+        }
+      ],
+      "description": "Analytics endpoints for tracking portfolio performance"
+    },
+    {
+      "name": "Subscriptions",
+      "item": [
+        {
+          "name": "Get All Subscription Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/plans",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "plans"]
+            },
+            "description": "Get all available subscription plans with pricing and features"
+          }
+        },
+        {
+          "name": "Get Current Subscription",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/current",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "current"]
+            },
+            "description": "Get details about the user's current subscription"
+          }
+        },
+        {
+          "name": "Initialize Subscription Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": \"RISE\",\n  \"billingCycle\": \"monthly\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/initialize",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "initialize"]
+            },
+            "description": "Initialize a subscription payment transaction"
+          }
+        },
+        {
+          "name": "Verify Payment (Callback)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/verify/:reference",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "verify", ":reference"],
+              "variable": [
+                {
+                  "key": "reference",
+                  "value": "payment_reference_here"
+                }
+              ]
+            },
+            "description": "Verify a payment after successful transaction"
+          }
+        },
+        {
+          "name": "Cancel Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "cancel"]
+            },
+            "description": "Cancel current subscription and revert to free tier"
+          }
+        }
+      ],
+      "description": "Subscription and payment endpoints"
     }
   ]
 }
