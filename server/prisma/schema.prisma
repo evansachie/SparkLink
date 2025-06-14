@@ -111,19 +111,21 @@ model Template {
 }
 
 model Page {
-  id          String    @id @default(cuid())
-  profileId   String
-  type        PageType
-  title       String
-  slug        String
-  content     Json      // Flexible JSON content based on page type
-  order       Int       @default(0)
-  isPublished Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id                  String    @id @default(cuid())
+  profileId           String
+  type                PageType
+  title               String
+  slug                String
+  content             Json      // Flexible JSON content based on page type
+  order               Int       @default(0)
+  isPublished         Boolean   @default(false)
+  isPasswordProtected Boolean   @default(false)
+  password            String?   // Stored as a hash
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
   
   // Relations
-  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile             Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
   
   @@map("pages")
   @@index([profileId, slug])

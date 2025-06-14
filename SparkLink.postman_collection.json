@@ -474,6 +474,118 @@
               "path": ["api", "pages", "reorder"]
             }
           }
+        },
+        {
+          "name": "Create Password-Protected Page",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PROJECTS\",\n  \"title\": \"Client Project\",\n  \"slug\": \"client-project\",\n  \"content\": {\n    \"headline\": \"Private Client Project\",\n    \"subheading\": \"Confidential Work\",\n    \"sections\": [\n      {\n        \"type\": \"text\",\n        \"content\": \"This is a confidential project that requires a password to view.\"\n      }\n    ]\n  },\n  \"isPublished\": true,\n  \"isPasswordProtected\": true,\n  \"password\": \"clientaccess123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages"]
+            },
+            "description": "Create a page with password protection (requires RISE or BLAZE tier)"
+          }
+        },
+        {
+          "name": "Update Page with Password Protection",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Client Project\",\n  \"isPasswordProtected\": true,\n  \"password\": \"newpassword456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pages/:pageId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages", ":pageId"],
+              "variable": [
+                {
+                  "key": "pageId",
+                  "value": "page_id_here"
+                }
+              ]
+            },
+            "description": "Update a page and add password protection"
+          }
+        },
+        {
+          "name": "Remove Password Protection",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isPasswordProtected\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pages/:pageId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages", ":pageId"],
+              "variable": [
+                {
+                  "key": "pageId",
+                  "value": "page_id_here"
+                }
+              ]
+            },
+            "description": "Remove password protection from a page"
+          }
+        },
+        {
+          "name": "Verify Page Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pageId\": \"page_id_here\",\n  \"password\": \"clientaccess123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pages/verify-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages", "verify-password"]
+            },
+            "description": "Verify the password for a password-protected page"
+          }
         }
       ]
     },
@@ -536,6 +648,28 @@
                 }
               ]
             }
+          }
+        },
+        {
+          "name": "Access Password Protected Page",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"johndoe\",\n  \"slug\": \"client-project\",\n  \"password\": \"clientaccess123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/public/access-protected",
+              "host": ["{{base_url}}"],
+              "path": ["api", "public", "access-protected"]
+            },
+            "description": "Access a password-protected page by providing the correct password"
           }
         }
       ]

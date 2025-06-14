@@ -1,7 +1,8 @@
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { AuthenticatedRequest } from '../types';
 import prisma from '../config/database';
-import { PageType } from '@prisma/client';
+import { PageType, SubscriptionTier } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 /**
  * Get all pages for a user's profile
@@ -109,7 +110,7 @@ export const getPageById = async (req: AuthenticatedRequest, res: Response) => {
 export const createPage = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    const { type, title, slug, content, isPublished } = req.body;
+    const { type, title, slug, content, isPublished, isPasswordProtected, password } = req.body;
     
     if (!userId) {
       return res.status(401).json({
@@ -132,6 +133,30 @@ export const createPage = async (req: AuthenticatedRequest, res: Response) => {
         status: 'ERROR',
         message: 'Invalid page type'
       });
+    }
+
+    // Get user with subscription information
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { subscription: true }
+    });
+
+    // Check password protection permissions
+    if (isPasswordProtected) {
+      if (user?.subscription === 'STARTER') {
+        return res.status(403).json({
+          status: 'ERROR',
+          message: 'Password protection requires a RISE or BLAZE subscription',
+          requiredTier: 'RISE'
+        });
+      }
+      
+      if (!password) {
+        return res.status(400).json({
+          status: 'ERROR',
+          message: 'Password is required for password-protected pages'
+        });
+      }
     }
 
     // Get or create profile
@@ -169,6 +194,12 @@ export const createPage = async (req: AuthenticatedRequest, res: Response) => {
       where: { profileId: profile.id }
     });
 
+    // Hash password if page is password protected
+    let hashedPassword = null;
+    if (isPasswordProtected && password) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+
     // Create new page
     const page = await prisma.page.create({
       data: {
@@ -178,14 +209,19 @@ export const createPage = async (req: AuthenticatedRequest, res: Response) => {
         slug,
         content: content || {},
         isPublished: isPublished || false,
-        order: pageCount // Place at the end by default
+        order: pageCount, // Place at the end by default
+        isPasswordProtected: Boolean(isPasswordProtected),
+        password: hashedPassword
       }
     });
+
+    // Remove password from response
+    const { password: _, ...pageWithoutPassword } = page;
 
     res.status(201).json({
       status: 'SUCCESS',
       message: 'Page created successfully',
-      data: { page }
+      data: { page: pageWithoutPassword }
     });
   } catch (error) {
     console.error('Create page error:', error);
@@ -203,7 +239,7 @@ export const updatePage = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const { pageId } = req.params;
-    const { title, slug, content, isPublished } = req.body;
+    const { title, slug, content, isPublished, isPasswordProtected, password } = req.body;
     
     if (!userId) {
       return res.status(401).json({
@@ -257,21 +293,70 @@ export const updatePage = async (req: AuthenticatedRequest, res: Response) => {
       }
     }
 
-    // Update page
+    // Get user with subscription information
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { subscription: true }
+    });
+
+    // Check password protection permissions
+    if (isPasswordProtected !== undefined && isPasswordProtected !== existingPage.isPasswordProtected) {
+      if (user?.subscription === 'STARTER') {
+        return res.status(403).json({
+          status: 'ERROR',
+          message: 'Password protection requires a RISE or BLAZE subscription',
+          requiredTier: 'RISE'
+        });
+      }
+      
+      if (isPasswordProtected && !password && !existingPage.password) {
+        return res.status(400).json({
+          status: 'ERROR',
+          message: 'Password is required when enabling password protection'
+        });
+      }
+    }
+
+    // Hash password if it's provided or if protection is newly enabled
+    let hashedPassword = undefined;
+    if (password) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+
+    // Prepare update data
+    const updateData: any = {
+      title,
+      slug,
+      content,
+      isPublished,
+      isPasswordProtected
+    };
+
+    // Only update password if a new one is provided
+    if (hashedPassword) {
+      updateData.password = hashedPassword;
+    }
+    
+    // If password protection is being turned off, remove the password
+    if (isPasswordProtected === false) {
+      updateData.password = null;
+    }
+
+    // Update page with clean undefined values
     const updatedPage = await prisma.page.update({
       where: { id: pageId },
-      data: {
-        title,
-        slug,
-        content,
-        isPublished
-      }
+      data: Object.fromEntries(
+        Object.entries(updateData).filter(([_, v]) => v !== undefined)
+      )
     });
+
+    // Remove password from response
+    const { password: _, ...pageWithoutPassword } = updatedPage;
 
     res.json({
       status: 'SUCCESS',
       message: 'Page updated successfully',
-      data: { page: updatedPage }
+      data: { page: pageWithoutPassword }
     });
   } catch (error) {
     console.error('Update page error:', error);
@@ -420,6 +505,88 @@ export const reorderPages = async (req: AuthenticatedRequest, res: Response) => 
     res.status(500).json({
       status: 'ERROR',
       message: 'Failed to reorder pages'
+    });
+  }
+};
+
+/**
+ * Verify password for a password-protected page
+ */
+export const verifyPagePassword = async (req: Request, res: Response) => {
+  try {
+    const { pageId, password } = req.body;
+    
+    if (!pageId || !password) {
+      return res.status(400).json({
+        status: 'ERROR',
+        message: 'Page ID and password are required'
+      });
+    }
+
+    // Find the page
+    const page = await prisma.page.findUnique({
+      where: { id: pageId }
+    });
+
+    if (!page) {
+      return res.status(404).json({
+        status: 'ERROR',
+        message: 'Page not found'
+      });
+    }
+
+    // If page is not password protected, no need to verify
+    if (!page.isPasswordProtected) {
+      return res.json({
+        status: 'SUCCESS',
+        message: 'Page is not password protected',
+        data: { 
+          valid: true,
+          pageId 
+        }
+      });
+    }
+
+    // If page is password protected but no password is set (should not happen)
+    if (!page.password) {
+      return res.status(400).json({
+        status: 'ERROR',
+        message: 'Page is password protected but no password is set'
+      });
+    }
+
+    // Verify password
+    const isValid = await bcrypt.compare(password, page.password);
+
+    if (isValid) {
+      // Generate a temporary access token for this page
+      // This could use JWT or a simple short-lived token in a separate table
+      // For simplicity, we'll just return success here
+      
+      res.json({
+        status: 'SUCCESS',
+        message: 'Password verified successfully',
+        data: {
+          valid: true,
+          pageId,
+          timestamp: Date.now(),
+          // Actual implementation would include a session token here
+        }
+      });
+    } else {
+      res.status(403).json({
+        status: 'ERROR',
+        message: 'Invalid password',
+        data: {
+          valid: false
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Verify page password error:', error);
+    res.status(500).json({
+      status: 'ERROR',
+      message: 'Failed to verify page password'
     });
   }
 };

@@ -14,7 +14,8 @@
     "sync-prisma": "ts-node src/utils/syncPrisma.ts",
     "reset-db": "ts-node src/scripts/restoreDatabase.ts",
     "fix-prisma": "ts-node src/scripts/fixPrisma.ts",
-    "migrate-templates": "ts-node src/scripts/manualMigration.ts"
+    "migrate-templates": "ts-node src/scripts/manualMigration.ts",
+    "add-password-protection": "ts-node src/scripts/addPasswordProtection.ts"
   },
   "keywords": [],
   "author": "",

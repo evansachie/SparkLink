@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../config/database';
+import bcrypt from 'bcryptjs';
 
 /**
  * Get a user's public profile by username
@@ -227,18 +228,149 @@ export const getPublicPageBySlug = async (req: Request, res: Response) => {
       });
     }
 
+    // Check if page is password protected
+    if (page.isPasswordProtected) {
+      // Only return essential data about the page, not the content
+      const { password: _, content: __, ...pageWithoutSensitiveData } = page;
+      
+      return res.json({
+        status: 'SUCCESS',
+        data: { 
+          page: {
+            ...pageWithoutSensitiveData,
+            isPasswordProtected: true,
+            requiresPassword: true
+          }
+        }
+      });
+    }
+
     // Track page view
     await trackPageView(user.id, page.id, req);
 
+    // Return full page data including content
+    const { password: _, ...pageWithoutPassword } = page;
+    
     res.json({
       status: 'SUCCESS',
-      data: { page }
+      data: { page: pageWithoutPassword }
     });
   } catch (error) {
     console.error('Get public page error:', error);
     res.status(500).json({
       status: 'ERROR',
       message: 'Failed to fetch page'
+    });
+  }
+};
+
+/**
+ * Access a password-protected page
+ */
+export const accessProtectedPage = async (req: Request, res: Response) => {
+  try {
+    const { username, slug, password } = req.body;
+    
+    if (!username || !slug) {
+      return res.status(400).json({
+        status: 'ERROR',
+        message: 'Username and slug are required'
+      });
+    }
+    
+    if (!password) {
+      return res.status(400).json({
+        status: 'ERROR',
+        message: 'Password is required'
+      });
+    }
+
+    // Find user by username
+    const user = await prisma.user.findUnique({
+      where: { username }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        status: 'ERROR',
+        message: 'User not found'
+      });
+    }
+
+    // Get profile
+    const profile = await prisma.profile.findUnique({
+      where: { userId: user.id }
+    });
+
+    if (!profile || !profile.isPublished) {
+      return res.status(403).json({
+        status: 'ERROR',
+        message: 'This profile is not published yet'
+      });
+    }
+
+    // Get the specific page
+    const page = await prisma.page.findFirst({
+      where: {
+        profileId: profile.id,
+        slug,
+        isPublished: true
+      }
+    });
+
+    if (!page) {
+      return res.status(404).json({
+        status: 'ERROR',
+        message: 'Page not found or not published'
+      });
+    }
+
+    // Check if page is password protected
+    if (!page.isPasswordProtected) {
+      // Page is not password protected, just return it
+      const { password: _, ...pageWithoutPassword } = page;
+      
+      await trackPageView(user.id, page.id, req);
+      
+      return res.json({
+        status: 'SUCCESS',
+        data: { page: pageWithoutPassword }
+      });
+    }
+
+    // Verify password
+    if (!page.password) {
+      return res.status(400).json({
+        status: 'ERROR',
+        message: 'Page is password protected but no password is set'
+      });
+    }
+
+    const isValidPassword = await bcrypt.compare(password, page.password);
+    
+    if (!isValidPassword) {
+      return res.status(403).json({
+        status: 'ERROR',
+        message: 'Invalid password'
+      });
+    }
+
+    // Password is valid, track view
+    await trackPageView(user.id, page.id, req);
+
+    // Return full page data
+    const { password: _, ...pageWithoutPassword } = page;
+    
+    res.json({
+      status: 'SUCCESS',
+      message: 'Access granted',
+      data: { page: pageWithoutPassword }
+    });
+  } catch (error) {
+    console.error('Access protected page error:', error);
+    res.status(500).json({
+      status: 'ERROR',
+      message: 'Failed to access protected page'
     });
   }
 };
