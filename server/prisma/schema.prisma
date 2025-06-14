@@ -7,6 +7,39 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Define subscription tier enum
+enum SubscriptionTier {
+  STARTER
+  RISE
+  BLAZE
+}
+
+// Define page type enum
+enum PageType {
+  HOME
+  ABOUT
+  SERVICES
+  PRODUCTS
+  PROJECTS
+  CONTACT
+  GALLERY
+  SKILLS
+  EDUCATION
+  EXPERIENCE
+  CERTIFICATIONS
+  BOOKING
+  PAYMENTS
+  EVENTS
+  CUSTOM
+}
+
+// Define event type enum
+enum AnalyticsEvent {
+  PROFILE_VIEW
+  PAGE_VIEW
+  LINK_CLICK
+}
+
 model User {
   id                  String    @id @default(cuid())
   email               String    @unique
@@ -44,15 +77,37 @@ model Profile {
   isPublished     Boolean  @default(false)
   customDomain    String?  @unique
   showPoweredBy   Boolean  @default(true)
+  templateId      String?
+  colorScheme     Json?    // Store color preferences
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   
   // Relations
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template        Template? @relation(fields: [templateId], references: [id])
   pages           Page[]
   socialLinks     SocialLink[]
   
   @@map("profiles")
+}
+
+model Template {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  previewImage    String
+  category        String   // "professional", "creative", "minimal", etc.
+  tier            SubscriptionTier  // Which subscription tier has access
+  features        Json     // Store template-specific features
+  isDefault       Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  profiles        Profile[]
+  
+  @@map("templates")
 }
 
 model Page {
@@ -61,17 +116,17 @@ model Page {
   type        PageType
   title       String
   slug        String
-  content     Json?
-  isPublished Boolean   @default(false)
+  content     Json      // Flexible JSON content based on page type
   order       Int       @default(0)
+  isPublished Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   
   // Relations
   profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
   
-  @@unique([profileId, slug])
   @@map("pages")
+  @@index([profileId, slug])
 }
 
 model SocialLink {
@@ -81,48 +136,28 @@ model SocialLink {
   url       String
   order     Int      @default(0)
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())  // Added default value for existing rows
   
   // Relations
   profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
   
   @@map("social_links")
+  @@index([profileId])
 }
 
 model Analytics {
-  id        String   @id @default(cuid())
-  userId    String
-  event     String
-  data      Json?
-  ipAddress String?
-  userAgent String?
-  createdAt DateTime @default(now())
+  id          String         @id @default(cuid())
+  userId      String
+  event       AnalyticsEvent
+  data        Json
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime       @default(now())
   
   // Relations
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@map("analytics")
-}
-
-enum SubscriptionTier {
-  STARTER
-  RISE
-  BLAZE
-}
-
-enum PageType {
-  HOME
-  SERVICES
-  PRODUCTS
-  ABOUT
-  CONTACT
-  EVENTS
-  SKILLS
-  CERTIFICATIONS
-  EDUCATION
-  PAYMENTS
-  PROJECTS
-  GALLERY
-  WORK_EXPERIENCE
-  BOOKING
-  CUSTOM
+  @@index([userId, event])
+  @@index([createdAt])
 }

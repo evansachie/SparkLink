@@ -724,6 +724,101 @@
         }
       ],
       "description": "Subscription and payment endpoints"
+    },
+    {
+      "name": "Templates",
+      "item": [
+        {
+          "name": "Get Available Templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/templates",
+              "host": ["{{base_url}}"],
+              "path": ["api", "templates"]
+            },
+            "description": "Get all templates available for the user's subscription tier"
+          }
+        },
+        {
+          "name": "Get Template Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/templates/:templateId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "templates", ":templateId"],
+              "variable": [
+                {
+                  "key": "templateId",
+                  "value": "minimal"
+                }
+              ]
+            },
+            "description": "Get details of a specific template"
+          }
+        },
+        {
+          "name": "Apply Template to Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"templateId\": \"minimal\",\n  \"colorScheme\": {\n    \"light\": {\n      \"primary\": \"#4A90E2\",\n      \"secondary\": \"#50E3C2\",\n      \"background\": \"#FFFFFF\",\n      \"text\": \"#333333\",\n      \"accent\": \"#FF5A5F\"\n    },\n    \"dark\": {\n      \"primary\": \"#4A90E2\",\n      \"secondary\": \"#50E3C2\",\n      \"background\": \"#121212\",\n      \"text\": \"#F5F5F5\",\n      \"accent\": \"#FF5A5F\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/templates/apply",
+              "host": ["{{base_url}}"],
+              "path": ["api", "templates", "apply"]
+            },
+            "description": "Apply a template to the user's profile"
+          }
+        },
+        {
+          "name": "Update Color Scheme",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"colorScheme\": {\n    \"light\": {\n      \"primary\": \"#4A90E2\",\n      \"secondary\": \"#50E3C2\",\n      \"background\": \"#FFFFFF\",\n      \"text\": \"#333333\",\n      \"accent\": \"#FF5A5F\"\n    },\n    \"dark\": {\n      \"primary\": \"#4A90E2\",\n      \"secondary\": \"#50E3C2\",\n      \"background\": \"#121212\",\n      \"text\": \"#F5F5F5\",\n      \"accent\": \"#FF5A5F\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/templates/colors",
+              "host": ["{{base_url}}"],
+              "path": ["api", "templates", "colors"]
+            },
+            "description": "Update color scheme for the user's profile"
+          }
+        }
+      ],
+      "description": "Template and theme management endpoints"
     }
   ]
 }

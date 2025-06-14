@@ -36,12 +36,19 @@ export const getPublicProfile = async (req: Request, res: Response) => {
       });
     }
 
-    // Get profile with social links
+    // Get profile with social links and template
     const profile = await prisma.profile.findUnique({
       where: { userId: user.id },
       include: {
         socialLinks: {
           orderBy: { order: 'asc' }
+        },
+        template: {
+          select: {
+            id: true,
+            name: true,
+            features: true
+          }
         }
       }
     });
@@ -84,7 +91,9 @@ export const getPublicProfile = async (req: Request, res: Response) => {
           backgroundImage: profile.backgroundImage,
           countryFlag: profile.countryFlag,
           showPoweredBy: profile.showPoweredBy,
-          socialLinks: profile.socialLinks
+          socialLinks: profile.socialLinks,
+          template: profile.template,
+          colorScheme: profile.colorScheme
         }
       }
     });
