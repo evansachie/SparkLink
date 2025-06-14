@@ -539,6 +539,191 @@
           }
         }
       ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Analytics Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analytics/summary",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analytics", "summary"]
+            },
+            "description": "Get overall analytics summary with total views and most viewed pages"
+          }
+        },
+        {
+          "name": "Get Visitor Trends",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analytics/trends?days=30",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analytics", "trends"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30",
+                  "description": "Number of days to get data for (default: 30, max: 365)"
+                }
+              ]
+            },
+            "description": "Get daily visitor trends over a specified period"
+          }
+        },
+        {
+          "name": "Get Geographic Distribution",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analytics/geo",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analytics", "geo"]
+            },
+            "description": "Get geographical distribution of visitors (currently returns sample data)"
+          }
+        },
+        {
+          "name": "Get Device Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analytics/devices",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analytics", "devices"]
+            },
+            "description": "Get device and browser statistics (currently returns sample data)"
+          }
+        }
+      ],
+      "description": "Analytics endpoints for tracking portfolio performance"
+    },
+    {
+      "name": "Subscriptions",
+      "item": [
+        {
+          "name": "Get All Subscription Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/plans",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "plans"]
+            },
+            "description": "Get all available subscription plans with pricing and features"
+          }
+        },
+        {
+          "name": "Get Current Subscription",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/current",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "current"]
+            },
+            "description": "Get details about the user's current subscription"
+          }
+        },
+        {
+          "name": "Initialize Subscription Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": \"RISE\",\n  \"billingCycle\": \"monthly\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/initialize",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "initialize"]
+            },
+            "description": "Initialize a subscription payment transaction"
+          }
+        },
+        {
+          "name": "Verify Payment (Callback)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/verify/:reference",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "verify", ":reference"],
+              "variable": [
+                {
+                  "key": "reference",
+                  "value": "payment_reference_here"
+                }
+              ]
+            },
+            "description": "Verify a payment after successful transaction"
+          }
+        },
+        {
+          "name": "Cancel Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/subscriptions/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["api", "subscriptions", "cancel"]
+            },
+            "description": "Cancel current subscription and revert to free tier"
+          }
+        }
+      ],
+      "description": "Subscription and payment endpoints"
     }
   ]
 }

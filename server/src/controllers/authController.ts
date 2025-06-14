@@ -215,44 +215,95 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    // Find user
-    const user = await prisma.user.findUnique({
-      where: { email }
-    });
-
-    if (!user || !user.password) {
-      return res.status(401).json({
-        status: 'ERROR',
-        message: 'Invalid email or password'
-      });
-    }
-
-    // Check password
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
-      return res.status(401).json({
-        status: 'ERROR',
-        message: 'Invalid email or password'
-      });
-    }
-
-    // Generate JWT token
-    const token = generateToken({
-      userId: user.id,
-      email: user.email
-    });
-
-    // Return user data without password
-    const { password: _, ...userWithoutPassword } = user;
-
-    res.json({
-      status: 'SUCCESS',
-      message: 'Login successful',
-      data: {
-        user: userWithoutPassword,
-        token
+    try {
+      // Find user with safe query that doesn't depend on subscription fields
+      const user = await prisma.$queryRaw`
+        SELECT * FROM "users" WHERE email = ${email} LIMIT 1
+      `;
+      
+      if (!user || !Array.isArray(user) || user.length === 0 || !user[0].password) {
+        return res.status(401).json({
+          status: 'ERROR',
+          message: 'Invalid email or password'
+        });
       }
-    });
+
+      const userData = user[0];
+
+      // Check password
+      const isValidPassword = await bcrypt.compare(password, userData.password);
+      if (!isValidPassword) {
+        return res.status(401).json({
+          status: 'ERROR',
+          message: 'Invalid email or password'
+        });
+      }
+
+      // Generate JWT token
+      const token = generateToken({
+        userId: userData.id,
+        email: userData.email
+      });
+
+      // Return user data without password
+      const { password: _, ...userWithoutPassword } = userData;
+
+      res.json({
+        status: 'SUCCESS',
+        message: 'Login successful',
+        data: {
+          user: userWithoutPassword,
+          token
+        }
+      });
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      
+      // Fallback: Try to find user with minimal fields
+      const basicUser = await prisma.user.findUnique({
+        where: { email },
+        select: {
+          id: true,
+          email: true,
+          password: true
+        }
+      });
+
+      if (!basicUser || !basicUser.password) {
+        return res.status(401).json({
+          status: 'ERROR',
+          message: 'Invalid email or password'
+        });
+      }
+
+      // Check password
+      const isValidPassword = await bcrypt.compare(password, basicUser.password);
+      if (!isValidPassword) {
+        return res.status(401).json({
+          status: 'ERROR',
+          message: 'Invalid email or password'
+        });
+      }
+
+      // Generate JWT token
+      const token = generateToken({
+        userId: basicUser.id,
+        email: basicUser.email
+      });
+
+      res.json({
+        status: 'SUCCESS',
+        message: 'Login successful (limited profile)',
+        data: {
+          user: {
+            id: basicUser.id,
+            email: basicUser.email,
+            subscription: 'STARTER'
+          },
+          token
+        }
+      });
+    }
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({
