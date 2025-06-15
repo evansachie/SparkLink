@@ -14,6 +14,7 @@ import templateRoutes from './routes/templateRoutes';
 import passport from './config/passport';
 import { initializeTemplates } from './controllers/templateController';
 import galleryRoutes from './routes/galleryRoutes';
+import verificationRoutes from './routes/verificationRoutes';
 
 dotenv.config();
 
@@ -48,6 +49,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/templates', templateRoutes);
 app.use('/api/gallery', galleryRoutes);
+app.use('/api/verification', verificationRoutes);
 
 // Base route - API information
 app.get('/', (req, res) => {

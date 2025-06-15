@@ -40,6 +40,24 @@ enum AnalyticsEvent {
   LINK_CLICK
 }
 
+// Define verification status enum
+enum VerificationStatus {
+  NONE         // Not requested
+  PENDING      // Submitted, waiting for review
+  APPROVED     // Approved, badge granted
+  REJECTED     // Rejected, can resubmit
+  REVOKED      // Badge revoked by admin
+}
+
+// Types of verification
+enum VerificationType {
+  IDENTITY     // Government ID verification
+  BUSINESS     // Business registration verification
+  SOCIAL       // Social media verification (follower count, etc.)
+  CELEBRITY    // Public figure verification
+  ORGANIZATION // Non-profit/organization verification
+}
+
 model User {
   id                  String    @id @default(cuid())
   email               String    @unique
@@ -57,12 +75,21 @@ model User {
   subscription        SubscriptionTier @default(STARTER)
   subscriptionData    Json?
   subscriptionExpiresAt DateTime?
+  // New verification fields
+  hasVerifiedBadge    Boolean   @default(false)
+  verificationStatus  VerificationStatus @default(NONE)
+  verificationData    Json?     // Store verification documents/info
+  verificationSubmittedAt DateTime?
+  verificationApprovedAt DateTime?
+  verificationRejectedAt DateTime?
+  verificationNotes   String?   // Admin notes for rejection/approval
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
   
   // Relations
   profile             Profile?
   analytics           Analytics[]
+  verificationRequests VerificationRequest[]
   
   @@map("users")
 }
@@ -144,7 +171,7 @@ model Gallery {
   order           Int      @default(0)
   isVisible       Boolean  @default(true)
   createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  updatedAt       DateTime @default(now())  // Added default value for existing rows
   
   // Relations
   profile         Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
@@ -185,4 +212,26 @@ model Analytics {
   @@map("analytics")
   @@index([userId, event])
   @@index([createdAt])
+}
+
+// New model for verification requests
+model VerificationRequest {
+  id              String   @id @default(cuid())
+  userId          String
+  requestType     VerificationType
+  status          VerificationStatus @default(PENDING)
+  submittedData   Json     // Documents, social links, etc.
+  submittedAt     DateTime @default(now())
+  reviewedAt      DateTime?
+  reviewedBy      String?  // Admin user ID who reviewed
+  reviewNotes     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("verification_requests")
+  @@index([userId])
+  @@index([status])
 }

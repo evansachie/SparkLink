@@ -16,19 +16,34 @@ export const getPublicProfile = async (req: Request, res: Response) => {
       });
     }
 
-    // Find user by username
-    const user = await prisma.user.findUnique({
-      where: { username },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        username: true,
-        country: true,
-        profilePicture: true,
-        subscription: true
-      }
-    });
+    // Find user by username with fallback for missing verification fields
+    let user: any;
+    try {
+      user = await prisma.user.findUnique({
+        where: { username },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          username: true,
+          country: true,
+          profilePicture: true,
+          subscription: true,
+          hasVerifiedBadge: true
+        }
+      });
+    } catch (error) {
+      // Fallback to raw query if hasVerifiedBadge field doesn't exist
+      const rawUser = await prisma.$queryRaw`
+        SELECT 
+          id, "firstName", "lastName", username, country, "profilePicture", subscription,
+          COALESCE("hasVerifiedBadge", false) as "hasVerifiedBadge"
+        FROM "users" 
+        WHERE username = ${username}
+        LIMIT 1
+      `;
+      user = Array.isArray(rawUser) && rawUser[0] ? rawUser[0] : null;
+    }
 
     if (!user) {
       return res.status(404).json({
@@ -84,7 +99,8 @@ export const getPublicProfile = async (req: Request, res: Response) => {
           lastName: user.lastName,
           username: user.username,
           country: user.country,
-          profilePicture: user.profilePicture
+          profilePicture: user.profilePicture,
+          hasVerifiedBadge: user.hasVerifiedBadge || false
         },
         profile: {
           bio: profile.bio,
