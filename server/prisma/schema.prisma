@@ -106,6 +106,12 @@ model Profile {
   showPoweredBy   Boolean  @default(true)
   templateId      String?
   colorScheme     Json?    // Store color preferences
+  // New resume fields
+  resumeUrl       String?  // Cloudinary URL for resume PDF
+  resumePublicId  String?  // Cloudinary public ID for deletion
+  resumeFileName  String?  // Original filename
+  resumeUploadedAt DateTime? // When resume was uploaded
+  allowResumeDownload Boolean @default(true) // Allow public download
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   

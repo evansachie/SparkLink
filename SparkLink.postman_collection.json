@@ -1403,6 +1403,141 @@
         }
       ],
       "description": "Verification badge system endpoints"
+    },
+    {
+      "name": "Resume Management",
+      "item": [
+        {
+          "name": "Upload Resume",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "resume",
+                  "type": "file",
+                  "src": [],
+                  "description": "PDF file of your resume"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/resume/upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "upload"]
+            },
+            "description": "Upload a resume PDF file (max 10MB)"
+          }
+        },
+        {
+          "name": "Get Resume Info",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/resume/info",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "info"]
+            },
+            "description": "Get information about uploaded resume"
+          }
+        },
+        {
+          "name": "Update Resume Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"allowResumeDownload\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/resume/settings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "settings"]
+            },
+            "description": "Enable or disable public resume download"
+          }
+        },
+        {
+          "name": "Delete Resume",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/resume",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume"]
+            },
+            "description": "Delete uploaded resume"
+          }
+        },
+        {
+          "name": "Get Public Resume Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/resume/public/:username/info",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "public", ":username", "info"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                }
+              ]
+            },
+            "description": "Get public resume information for a user"
+          }
+        },
+        {
+          "name": "Download Resume",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/resume/download/:username",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "download", ":username"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                }
+              ]
+            },
+            "description": "Download a user's resume (if allowed)"
+          }
+        }
+      ],
+      "description": "Resume upload and download management"
     }
   ]
 }

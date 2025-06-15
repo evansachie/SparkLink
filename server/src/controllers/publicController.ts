@@ -52,7 +52,7 @@ export const getPublicProfile = async (req: Request, res: Response) => {
       });
     }
 
-    // Get profile with social links and template
+    // Get profile with social links, template, and resume info
     const profile = await prisma.profile.findUnique({
       where: { userId: user.id },
       include: {
@@ -110,7 +110,9 @@ export const getPublicProfile = async (req: Request, res: Response) => {
           showPoweredBy: profile.showPoweredBy,
           socialLinks: profile.socialLinks,
           template: profile.template,
-          colorScheme: profile.colorScheme
+          colorScheme: profile.colorScheme,
+          hasResume: !!profile.resumeFileName && profile.allowResumeDownload,
+          resumeFileName: profile.allowResumeDownload ? profile.resumeFileName : null
         }
       }
     });

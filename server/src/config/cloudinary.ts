@@ -53,6 +53,21 @@ const galleryStorage = new CloudinaryStorage({
   }
 } as CloudinaryStorageParams);
 
+// Configure storage for resume uploads (PDF only)
+const resumeStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'sparklink/resumes',
+    allowed_formats: ['pdf'],
+    resource_type: 'raw',
+    public_id: (req: any, file: Express.Multer.File) => {
+      const userId = req.user?.id || 'anonymous';
+      const uniqueSuffix = Date.now();
+      return `resume-${userId}-${uniqueSuffix}`;
+    }
+  }
+} as CloudinaryStorageParams);
+
 // Create multer upload middleware
 export const upload = multer({ storage });
 
@@ -61,6 +76,21 @@ export const galleryUpload = multer({
   storage: galleryStorage,
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
+
+// Create multer upload middleware for resumes
+export const resumeUpload = multer({ 
+  storage: resumeStorage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit for PDF files
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF files are allowed for resume upload'));
+    }
   }
 });
 

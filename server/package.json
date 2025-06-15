@@ -17,7 +17,8 @@
     "migrate-templates": "ts-node src/scripts/manualMigration.ts",
     "add-password-protection": "ts-node src/scripts/addPasswordProtection.ts",
     "add-gallery": "ts-node src/scripts/addGalleryModel.ts",
-    "add-verification": "ts-node src/scripts/addVerificationSystem.ts"
+    "add-verification": "ts-node src/scripts/addVerificationSystem.ts",
+    "add-resume-fields": "ts-node src/scripts/addResumeFields.ts"
   },
   "keywords": [],
   "author": "",

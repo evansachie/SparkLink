@@ -3,7 +3,6 @@ import { AuthenticatedRequest } from '../types';
 import prisma from '../config/database';
 import cloudinary from '../config/cloudinary';
 
-// Define types since they might not be available yet
 type VerificationStatus = 'NONE' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'REVOKED';
 type VerificationType = 'IDENTITY' | 'BUSINESS' | 'SOCIAL' | 'CELEBRITY' | 'ORGANIZATION';
 
