@@ -1184,6 +1184,225 @@
         }
       ],
       "description": "Template and theme management endpoints"
+    },
+    {
+      "name": "Verification",
+      "item": [
+        {
+          "name": "Get Verification Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/verification/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "status"]
+            },
+            "description": "Get current verification status for the authenticated user"
+          }
+        },
+        {
+          "name": "Get Verification Requirements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/verification/requirements",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "requirements"]
+            },
+            "description": "Get verification requirements and guidelines for each verification type"
+          }
+        },
+        {
+          "name": "Submit Verification Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "verificationType",
+                  "value": "IDENTITY",
+                  "type": "text",
+                  "description": "IDENTITY, BUSINESS, SOCIAL, CELEBRITY, or ORGANIZATION"
+                },
+                {
+                  "key": "socialLinks",
+                  "value": "{\"twitter\": \"https://twitter.com/username\", \"instagram\": \"https://instagram.com/username\"}",
+                  "type": "text",
+                  "description": "JSON object with social media links"
+                },
+                {
+                  "key": "businessInfo",
+                  "value": "{\"companyName\": \"My Company\", \"registrationNumber\": \"123456\"}",
+                  "type": "text",
+                  "description": "JSON object with business information"
+                },
+                {
+                  "key": "additionalInfo",
+                  "value": "Additional information about why I should be verified",
+                  "type": "text"
+                },
+                {
+                  "key": "documents",
+                  "type": "file",
+                  "src": [],
+                  "description": "Upload verification documents (max 5 files)"
+                },
+                {
+                  "key": "documents",
+                  "type": "file",
+                  "src": [],
+                  "description": "Additional document"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/verification/submit",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "submit"]
+            },
+            "description": "Submit a verification request (BLAZE tier only)"
+          }
+        },
+        {
+          "name": "Get Verification History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/verification/history",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "history"]
+            },
+            "description": "Get history of all verification requests"
+          }
+        },
+        {
+          "name": "Cancel Verification Request",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/verification/cancel/:requestId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "cancel", ":requestId"],
+              "variable": [
+                {
+                  "key": "requestId",
+                  "value": "request_id_here"
+                }
+              ]
+            },
+            "description": "Cancel a pending verification request"
+          }
+        },
+        {
+          "name": "Get Pending Verifications (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/verification/admin/pending",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "admin", "pending"]
+            },
+            "description": "Get all pending verification requests (Admin only)"
+          }
+        },
+        {
+          "name": "Approve Verification (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Verification approved. All documents are valid.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/verification/admin/approve/:requestId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "admin", "approve", ":requestId"],
+              "variable": [
+                {
+                  "key": "requestId",
+                  "value": "request_id_here"
+                }
+              ]
+            },
+            "description": "Approve a verification request (Admin only)"
+          }
+        },
+        {
+          "name": "Reject Verification (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Documents are not clear enough. Please resubmit with higher quality images.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/verification/admin/reject/:requestId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "admin", "reject", ":requestId"],
+              "variable": [
+                {
+                  "key": "requestId",
+                  "value": "request_id_here"
+                }
+              ]
+            },
+            "description": "Reject a verification request (Admin only)"
+          }
+        }
+      ],
+      "description": "Verification badge system endpoints"
     }
   ]
 }
