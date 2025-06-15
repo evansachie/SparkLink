@@ -15,7 +15,8 @@
     "reset-db": "ts-node src/scripts/restoreDatabase.ts",
     "fix-prisma": "ts-node src/scripts/fixPrisma.ts",
     "migrate-templates": "ts-node src/scripts/manualMigration.ts",
-    "add-password-protection": "ts-node src/scripts/addPasswordProtection.ts"
+    "add-password-protection": "ts-node src/scripts/addPasswordProtection.ts",
+    "add-gallery": "ts-node src/scripts/addGalleryModel.ts"
   },
   "keywords": [],
   "author": "",

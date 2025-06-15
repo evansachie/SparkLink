@@ -3,7 +3,8 @@ import {
   getPublicProfile, 
   getPublicPages, 
   getPublicPageBySlug,
-  accessProtectedPage
+  accessProtectedPage,
+  getPublicGallery
 } from '../controllers/publicController';
 
 const router = Router();
@@ -12,6 +13,7 @@ const router = Router();
 router.get('/:username', getPublicProfile as any);
 router.get('/:username/pages', getPublicPages as any);
 router.get('/:username/pages/:slug', getPublicPageBySlug as any);
+router.get('/:username/gallery', getPublicGallery as any);
 
 // Password protected page access
 router.post('/access-protected', accessProtectedPage as any);

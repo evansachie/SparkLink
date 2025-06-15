@@ -590,6 +590,201 @@
       ]
     },
     {
+      "name": "Gallery Management",
+      "item": [
+        {
+          "name": "Get Gallery Items",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gallery?category=products&limit=10&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gallery"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "products",
+                  "description": "Filter by category (optional)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of items to return"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Number of items to skip"
+                }
+              ]
+            },
+            "description": "Get all gallery items for the authenticated user"
+          }
+        },
+        {
+          "name": "Upload Gallery Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "title",
+                  "value": "Amazing Product",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "This is an amazing product that we offer",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "products",
+                  "type": "text"
+                },
+                {
+                  "key": "tags",
+                  "value": "[\"handmade\", \"quality\", \"premium\"]",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/gallery/upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gallery", "upload"]
+            },
+            "description": "Upload a new gallery item with image"
+          }
+        },
+        {
+          "name": "Get Gallery Item by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gallery/:itemId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gallery", ":itemId"],
+              "variable": [
+                {
+                  "key": "itemId",
+                  "value": "gallery_item_id_here"
+                }
+              ]
+            },
+            "description": "Get details of a specific gallery item"
+          }
+        },
+        {
+          "name": "Update Gallery Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Product Name\",\n  \"description\": \"Updated description\",\n  \"category\": \"premium-products\",\n  \"tags\": [\"luxury\", \"handcrafted\"],\n  \"isVisible\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/gallery/:itemId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gallery", ":itemId"],
+              "variable": [
+                {
+                  "key": "itemId",
+                  "value": "gallery_item_id_here"
+                }
+              ]
+            },
+            "description": "Update gallery item details (not the image)"
+          }
+        },
+        {
+          "name": "Delete Gallery Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gallery/:itemId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gallery", ":itemId"],
+              "variable": [
+                {
+                  "key": "itemId",
+                  "value": "gallery_item_id_here"
+                }
+              ]
+            },
+            "description": "Delete a gallery item and its image from Cloudinary"
+          }
+        },
+        {
+          "name": "Reorder Gallery Items",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemOrders\": [\n    { \"id\": \"item_id_1\", \"order\": 0 },\n    { \"id\": \"item_id_2\", \"order\": 1 },\n    { \"id\": \"item_id_3\", \"order\": 2 }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/gallery/reorder",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gallery", "reorder"]
+            },
+            "description": "Reorder gallery items"
+          }
+        }
+      ],
+      "description": "Gallery management endpoints for uploading and managing product images"
+    },
+    {
       "name": "Public Portfolio",
       "item": [
         {
@@ -670,6 +865,42 @@
               "path": ["api", "public", "access-protected"]
             },
             "description": "Access a password-protected page by providing the correct password"
+          }
+        },
+        {
+          "name": "Get Public Gallery",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/public/:username/gallery?category=products&limit=10&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "public", ":username", "gallery"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                }
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "products",
+                  "description": "Filter by category (optional)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of items to return"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Number of items to skip"
+                }
+              ]
+            },
+            "description": "Get public gallery items for a user's portfolio"
           }
         }
       ]

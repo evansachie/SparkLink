@@ -38,8 +38,31 @@ const storage = new CloudinaryStorage({
   }
 } as CloudinaryStorageParams);
 
+// Configure storage with proper typing for gallery images
+const galleryStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'sparklink/gallery',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    transformation: [{ width: 800, height: 800, crop: 'limit', quality: 'auto' }],
+    public_id: (req: any, file: Express.Multer.File) => {
+      const userId = req.user?.id || 'anonymous';
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      return `gallery-${userId}-${uniqueSuffix}`;
+    }
+  }
+} as CloudinaryStorageParams);
+
 // Create multer upload middleware
 export const upload = multer({ storage });
+
+// Create multer upload middleware for gallery
+export const galleryUpload = multer({ 
+  storage: galleryStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
 
 // Export cloudinary for direct operations
 export default cloudinary;

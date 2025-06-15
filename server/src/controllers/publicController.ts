@@ -376,6 +376,115 @@ export const accessProtectedPage = async (req: Request, res: Response) => {
 };
 
 /**
+ * Get public gallery items for a user
+ */
+export const getPublicGallery = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.params;
+    const { category, limit = '20', offset = '0' } = req.query;
+    
+    if (!username) {
+      return res.status(400).json({
+        status: 'ERROR',
+        message: 'Username is required'
+      });
+    }
+
+    // Find user by username
+    const user = await prisma.user.findUnique({
+      where: { username }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        status: 'ERROR',
+        message: 'User not found'
+      });
+    }
+
+    // Get profile
+    const profile = await prisma.profile.findUnique({
+      where: { userId: user.id }
+    });
+
+    if (!profile || !profile.isPublished) {
+      return res.status(403).json({
+        status: 'ERROR',
+        message: 'This profile is not published yet'
+      });
+    }
+
+    // Build where clause
+    const whereClause: any = {
+      profileId: profile.id,
+      isVisible: true
+    };
+
+    if (category && typeof category === 'string') {
+      whereClause.category = category;
+    }
+
+    // Get gallery items
+    const galleryItems = await prisma.gallery.findMany({
+      where: whereClause,
+      orderBy: [
+        { order: 'asc' },
+        { createdAt: 'desc' }
+      ],
+      take: parseInt(limit as string),
+      skip: parseInt(offset as string),
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        imageUrl: true,
+        category: true,
+        tags: true,
+        order: true,
+        createdAt: true
+      }
+    });
+
+    // Get total count for pagination
+    const totalCount = await prisma.gallery.count({
+      where: whereClause
+    });
+
+    // Get unique categories
+    const categories = await prisma.gallery.findMany({
+      where: { profileId: profile.id, isVisible: true },
+      select: { category: true },
+      distinct: ['category']
+    });
+
+    const uniqueCategories = categories
+      .map(item => item.category)
+      .filter(Boolean)
+      .sort();
+
+    res.json({
+      status: 'SUCCESS',
+      data: {
+        items: galleryItems,
+        pagination: {
+          total: totalCount,
+          limit: parseInt(limit as string),
+          offset: parseInt(offset as string),
+          hasMore: totalCount > parseInt(offset as string) + parseInt(limit as string)
+        },
+        categories: uniqueCategories
+      }
+    });
+  } catch (error) {
+    console.error('Get public gallery error:', error);
+    res.status(500).json({
+      status: 'ERROR',
+      message: 'Failed to fetch gallery'
+    });
+  }
+};
+
+/**
  * Track profile view in analytics
  */
 async function trackProfileView(userId: string, req: Request): Promise<void> {

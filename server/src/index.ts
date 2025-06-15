@@ -13,16 +13,15 @@ import subscriptionRoutes from './routes/subscriptionRoutes';
 import templateRoutes from './routes/templateRoutes';
 import passport from './config/passport';
 import { initializeTemplates } from './controllers/templateController';
+import galleryRoutes from './routes/galleryRoutes';
 
-// Load environment variables
 dotenv.config();
 
-// Initialize templates in the database, but don't block server startup
 setTimeout(() => {
   initializeTemplates()
     .then(() => console.log('✅ Templates initialization complete'))
     .catch((err) => console.error('❌ Templates initialization failed:', err));
-}, 5000); // Wait 5 seconds after server start to ensure DB is ready
+}, 5000);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -48,6 +47,7 @@ app.use('/api/public', publicRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/templates', templateRoutes);
+app.use('/api/gallery', galleryRoutes);
 
 // Base route - API information
 app.get('/', (req, res) => {
