@@ -10,7 +10,15 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "sync-prisma": "ts-node src/utils/syncPrisma.ts",
+    "reset-db": "ts-node src/scripts/restoreDatabase.ts",
+    "fix-prisma": "ts-node src/scripts/fixPrisma.ts",
+    "migrate-templates": "ts-node src/scripts/manualMigration.ts",
+    "add-password-protection": "ts-node src/scripts/addPasswordProtection.ts",
+    "add-gallery": "ts-node src/scripts/addGalleryModel.ts",
+    "add-verification": "ts-node src/scripts/addVerificationSystem.ts",
+    "add-resume-fields": "ts-node src/scripts/addResumeFields.ts"
   },
   "keywords": [],
   "author": "",

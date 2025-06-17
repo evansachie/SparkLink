@@ -21,20 +21,42 @@ export const getCurrentProfile = async (req: AuthenticatedRequest, res: Response
     let profile = await prisma.profile.findUnique({
       where: { userId },
       include: {
-        socialLinks: true
+        socialLinks: {
+          orderBy: { order: 'asc' }
+        },
+        template: true
       }
     });
 
-    // If profile doesn't exist, create an empty one
+    // If profile doesn't exist, create an empty one with default template
     if (!profile) {
+      // Find default template
+      const defaultTemplate = await prisma.template.findFirst({
+        where: { 
+          isDefault: true,
+          tier: 'STARTER'
+        }
+      });
+
       profile = await prisma.profile.create({
         data: {
           userId,
           isPublished: false,
-          showPoweredBy: true
+          showPoweredBy: true,
+          templateId: defaultTemplate?.id,
+          colorScheme: {
+            light: {
+              primary: '#3498db',
+              secondary: '#2ecc71',
+              background: '#ffffff',
+              text: '#333333',
+              accent: '#e74c3c'
+            }
+          }
         },
         include: {
-          socialLinks: true
+          socialLinks: true,
+          template: true
         }
       });
     }
@@ -44,14 +66,16 @@ export const getCurrentProfile = async (req: AuthenticatedRequest, res: Response
       where: { id: userId },
       select: {
         id: true,
+        email: true,
         firstName: true,
         lastName: true,
         username: true,
-        email: true,
         country: true,
         phone: true,
         profilePicture: true,
-        subscription: true
+        isVerified: true,
+        subscription: true,
+        subscriptionExpiresAt: true
       }
     });
 

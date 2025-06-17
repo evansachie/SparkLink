@@ -474,8 +474,315 @@
               "path": ["api", "pages", "reorder"]
             }
           }
+        },
+        {
+          "name": "Create Password-Protected Page",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PROJECTS\",\n  \"title\": \"Client Project\",\n  \"slug\": \"client-project\",\n  \"content\": {\n    \"headline\": \"Private Client Project\",\n    \"subheading\": \"Confidential Work\",\n    \"sections\": [\n      {\n        \"type\": \"text\",\n        \"content\": \"This is a confidential project that requires a password to view.\"\n      }\n    ]\n  },\n  \"isPublished\": true,\n  \"isPasswordProtected\": true,\n  \"password\": \"clientaccess123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages"]
+            },
+            "description": "Create a page with password protection (requires RISE or BLAZE tier)"
+          }
+        },
+        {
+          "name": "Update Page with Password Protection",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Client Project\",\n  \"isPasswordProtected\": true,\n  \"password\": \"newpassword456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pages/:pageId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages", ":pageId"],
+              "variable": [
+                {
+                  "key": "pageId",
+                  "value": "page_id_here"
+                }
+              ]
+            },
+            "description": "Update a page and add password protection"
+          }
+        },
+        {
+          "name": "Remove Password Protection",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isPasswordProtected\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pages/:pageId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages", ":pageId"],
+              "variable": [
+                {
+                  "key": "pageId",
+                  "value": "page_id_here"
+                }
+              ]
+            },
+            "description": "Remove password protection from a page"
+          }
+        },
+        {
+          "name": "Verify Page Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pageId\": \"page_id_here\",\n  \"password\": \"clientaccess123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pages/verify-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pages", "verify-password"]
+            },
+            "description": "Verify the password for a password-protected page"
+          }
         }
       ]
+    },
+    {
+      "name": "Gallery Management",
+      "item": [
+        {
+          "name": "Get Gallery Items",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gallery?category=products&limit=10&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gallery"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "products",
+                  "description": "Filter by category (optional)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of items to return"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Number of items to skip"
+                }
+              ]
+            },
+            "description": "Get all gallery items for the authenticated user"
+          }
+        },
+        {
+          "name": "Upload Gallery Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "title",
+                  "value": "Amazing Product",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "This is an amazing product that we offer",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "products",
+                  "type": "text"
+                },
+                {
+                  "key": "tags",
+                  "value": "[\"handmade\", \"quality\", \"premium\"]",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/gallery/upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gallery", "upload"]
+            },
+            "description": "Upload a new gallery item with image"
+          }
+        },
+        {
+          "name": "Get Gallery Item by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gallery/:itemId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gallery", ":itemId"],
+              "variable": [
+                {
+                  "key": "itemId",
+                  "value": "gallery_item_id_here"
+                }
+              ]
+            },
+            "description": "Get details of a specific gallery item"
+          }
+        },
+        {
+          "name": "Update Gallery Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Product Name\",\n  \"description\": \"Updated description\",\n  \"category\": \"premium-products\",\n  \"tags\": [\"luxury\", \"handcrafted\"],\n  \"isVisible\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/gallery/:itemId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gallery", ":itemId"],
+              "variable": [
+                {
+                  "key": "itemId",
+                  "value": "gallery_item_id_here"
+                }
+              ]
+            },
+            "description": "Update gallery item details (not the image)"
+          }
+        },
+        {
+          "name": "Delete Gallery Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gallery/:itemId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gallery", ":itemId"],
+              "variable": [
+                {
+                  "key": "itemId",
+                  "value": "gallery_item_id_here"
+                }
+              ]
+            },
+            "description": "Delete a gallery item and its image from Cloudinary"
+          }
+        },
+        {
+          "name": "Reorder Gallery Items",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemOrders\": [\n    { \"id\": \"item_id_1\", \"order\": 0 },\n    { \"id\": \"item_id_2\", \"order\": 1 },\n    { \"id\": \"item_id_3\", \"order\": 2 }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/gallery/reorder",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gallery", "reorder"]
+            },
+            "description": "Reorder gallery items"
+          }
+        }
+      ],
+      "description": "Gallery management endpoints for uploading and managing product images"
     },
     {
       "name": "Public Portfolio",
@@ -536,6 +843,64 @@
                 }
               ]
             }
+          }
+        },
+        {
+          "name": "Access Password Protected Page",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"johndoe\",\n  \"slug\": \"client-project\",\n  \"password\": \"clientaccess123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/public/access-protected",
+              "host": ["{{base_url}}"],
+              "path": ["api", "public", "access-protected"]
+            },
+            "description": "Access a password-protected page by providing the correct password"
+          }
+        },
+        {
+          "name": "Get Public Gallery",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/public/:username/gallery?category=products&limit=10&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "public", ":username", "gallery"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                }
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "products",
+                  "description": "Filter by category (optional)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of items to return"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Number of items to skip"
+                }
+              ]
+            },
+            "description": "Get public gallery items for a user's portfolio"
           }
         }
       ]
@@ -724,6 +1089,455 @@
         }
       ],
       "description": "Subscription and payment endpoints"
+    },
+    {
+      "name": "Templates",
+      "item": [
+        {
+          "name": "Get Available Templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/templates",
+              "host": ["{{base_url}}"],
+              "path": ["api", "templates"]
+            },
+            "description": "Get all templates available for the user's subscription tier"
+          }
+        },
+        {
+          "name": "Get Template Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/templates/:templateId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "templates", ":templateId"],
+              "variable": [
+                {
+                  "key": "templateId",
+                  "value": "minimal"
+                }
+              ]
+            },
+            "description": "Get details of a specific template"
+          }
+        },
+        {
+          "name": "Apply Template to Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"templateId\": \"minimal\",\n  \"colorScheme\": {\n    \"light\": {\n      \"primary\": \"#4A90E2\",\n      \"secondary\": \"#50E3C2\",\n      \"background\": \"#FFFFFF\",\n      \"text\": \"#333333\",\n      \"accent\": \"#FF5A5F\"\n    },\n    \"dark\": {\n      \"primary\": \"#4A90E2\",\n      \"secondary\": \"#50E3C2\",\n      \"background\": \"#121212\",\n      \"text\": \"#F5F5F5\",\n      \"accent\": \"#FF5A5F\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/templates/apply",
+              "host": ["{{base_url}}"],
+              "path": ["api", "templates", "apply"]
+            },
+            "description": "Apply a template to the user's profile"
+          }
+        },
+        {
+          "name": "Update Color Scheme",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"colorScheme\": {\n    \"light\": {\n      \"primary\": \"#4A90E2\",\n      \"secondary\": \"#50E3C2\",\n      \"background\": \"#FFFFFF\",\n      \"text\": \"#333333\",\n      \"accent\": \"#FF5A5F\"\n    },\n    \"dark\": {\n      \"primary\": \"#4A90E2\",\n      \"secondary\": \"#50E3C2\",\n      \"background\": \"#121212\",\n      \"text\": \"#F5F5F5\",\n      \"accent\": \"#FF5A5F\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/templates/colors",
+              "host": ["{{base_url}}"],
+              "path": ["api", "templates", "colors"]
+            },
+            "description": "Update color scheme for the user's profile"
+          }
+        }
+      ],
+      "description": "Template and theme management endpoints"
+    },
+    {
+      "name": "Verification",
+      "item": [
+        {
+          "name": "Get Verification Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/verification/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "status"]
+            },
+            "description": "Get current verification status for the authenticated user"
+          }
+        },
+        {
+          "name": "Get Verification Requirements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/verification/requirements",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "requirements"]
+            },
+            "description": "Get verification requirements and guidelines for each verification type"
+          }
+        },
+        {
+          "name": "Submit Verification Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "verificationType",
+                  "value": "IDENTITY",
+                  "type": "text",
+                  "description": "IDENTITY, BUSINESS, SOCIAL, CELEBRITY, or ORGANIZATION"
+                },
+                {
+                  "key": "socialLinks",
+                  "value": "{\"twitter\": \"https://twitter.com/username\", \"instagram\": \"https://instagram.com/username\"}",
+                  "type": "text",
+                  "description": "JSON object with social media links"
+                },
+                {
+                  "key": "businessInfo",
+                  "value": "{\"companyName\": \"My Company\", \"registrationNumber\": \"123456\"}",
+                  "type": "text",
+                  "description": "JSON object with business information"
+                },
+                {
+                  "key": "additionalInfo",
+                  "value": "Additional information about why I should be verified",
+                  "type": "text"
+                },
+                {
+                  "key": "documents",
+                  "type": "file",
+                  "src": [],
+                  "description": "Upload verification documents (max 5 files)"
+                },
+                {
+                  "key": "documents",
+                  "type": "file",
+                  "src": [],
+                  "description": "Additional document"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/verification/submit",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "submit"]
+            },
+            "description": "Submit a verification request (BLAZE tier only)"
+          }
+        },
+        {
+          "name": "Get Verification History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/verification/history",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "history"]
+            },
+            "description": "Get history of all verification requests"
+          }
+        },
+        {
+          "name": "Cancel Verification Request",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/verification/cancel/:requestId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "cancel", ":requestId"],
+              "variable": [
+                {
+                  "key": "requestId",
+                  "value": "request_id_here"
+                }
+              ]
+            },
+            "description": "Cancel a pending verification request"
+          }
+        },
+        {
+          "name": "Get Pending Verifications (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/verification/admin/pending",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "admin", "pending"]
+            },
+            "description": "Get all pending verification requests (Admin only)"
+          }
+        },
+        {
+          "name": "Approve Verification (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Verification approved. All documents are valid.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/verification/admin/approve/:requestId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "admin", "approve", ":requestId"],
+              "variable": [
+                {
+                  "key": "requestId",
+                  "value": "request_id_here"
+                }
+              ]
+            },
+            "description": "Approve a verification request (Admin only)"
+          }
+        },
+        {
+          "name": "Reject Verification (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Documents are not clear enough. Please resubmit with higher quality images.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/verification/admin/reject/:requestId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verification", "admin", "reject", ":requestId"],
+              "variable": [
+                {
+                  "key": "requestId",
+                  "value": "request_id_here"
+                }
+              ]
+            },
+            "description": "Reject a verification request (Admin only)"
+          }
+        }
+      ],
+      "description": "Verification badge system endpoints"
+    },
+    {
+      "name": "Resume Management",
+      "item": [
+        {
+          "name": "Upload Resume",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "resume",
+                  "type": "file",
+                  "src": [],
+                  "description": "PDF file of your resume"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/resume/upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "upload"]
+            },
+            "description": "Upload a resume PDF file (max 10MB)"
+          }
+        },
+        {
+          "name": "Get Resume Info",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/resume/info",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "info"]
+            },
+            "description": "Get information about uploaded resume"
+          }
+        },
+        {
+          "name": "Update Resume Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"allowResumeDownload\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/resume/settings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "settings"]
+            },
+            "description": "Enable or disable public resume download"
+          }
+        },
+        {
+          "name": "Delete Resume",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/resume",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume"]
+            },
+            "description": "Delete uploaded resume"
+          }
+        },
+        {
+          "name": "Get Public Resume Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/resume/public/:username/info",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "public", ":username", "info"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                }
+              ]
+            },
+            "description": "Get public resume information for a user"
+          }
+        },
+        {
+          "name": "Download Resume",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/resume/download/:username",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "download", ":username"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "johndoe"
+                }
+              ]
+            },
+            "description": "Download a user's resume (if allowed)"
+          }
+        }
+      ],
+      "description": "Resume upload and download management"
     }
   ]
 }
