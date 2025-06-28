@@ -5,7 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { registerUser } from "../../services/api/auth";
-import Logo from "../../assets/spark-logo.jpg";
+import Logo from "../../components/common/Logo";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import Button from "../../components/common/Button";
 
@@ -64,9 +64,7 @@ const RegisterPage = () => {
       >
         <div className="w-full max-w-md">
           <div className="flex items-center justify-center mb-8">
-            <Link to="/login">
-              <img src={Logo} alt="SparkLink Logo" className="h-16 w-auto" />
-            </Link>
+            <Logo size={64} />
           </div>
           <h2 className="text-3xl font-bold mb-6 text-black text-center">Create your SparkLink account</h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
