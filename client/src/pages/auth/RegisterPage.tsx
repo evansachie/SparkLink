@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { registerUser } from "../../services/api/auth";
 import Logo from "../../assets/spark-logo.jpg";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import Button from "../../components/common/Button";
 
 const registerSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -49,7 +50,7 @@ const RegisterPage = () => {
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:3001/api"}/auth/google`;
+    window.location.href = `${"https://sparklink.onrender.com/api"}/auth/google`;
   };
 
   return (
@@ -114,13 +115,13 @@ const RegisterPage = () => {
             {successMsg && (
               <div className="text-success text-sm text-center">{successMsg}</div>
             )}
-            <button
+            <Button
               type="submit"
-              className="w-full bg-primary hover:bg-black text-white font-semibold py-2 rounded transition"
-              disabled={isSubmitting}
+              loading={isSubmitting}
+              className="mt-2"
             >
               {isSubmitting ? "Creating account..." : "Sign Up"}
-            </button>
+            </Button>
           </form>
           <div className="my-4 flex items-center">
             <div className="flex-grow border-t border-gray-200"></div>
@@ -132,6 +133,7 @@ const RegisterPage = () => {
             whileHover={{ scale: 1.03 }}
             onClick={handleGoogleSignup}
             className="w-full flex items-center justify-center bg-white border border-gray-300 hover:bg-primary/10 text-black font-semibold py-2 rounded transition"
+            type="button"
           >
             <img
               src="https://www.svgrepo.com/show/475656/google-color.svg"
