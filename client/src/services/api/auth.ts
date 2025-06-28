@@ -31,4 +31,18 @@ export const registerUser = async (data: RegisterPayload) => {
   return res.data.data;
 };
 
+export async function verifyEmail(data: { email: string; otp: string }) {
+  const res = await axios.post(`${API_URL}/auth/verify-email`, data, {
+    withCredentials: true,
+  });
+  return res.data.data;
+}
+
+export async function resendVerification(data: { email: string }) {
+  const res = await axios.post(`${API_URL}/auth/resend-verification`, data, {
+    withCredentials: true,
+  });
+  return res.data;
+}
+
 // ...add other auth-related API functions as needed...
