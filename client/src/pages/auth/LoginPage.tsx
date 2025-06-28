@@ -7,6 +7,7 @@ import { login as loginApi } from "../../services/api/auth";
 import Logo from "../../components/common/Logo";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import Button from "../../components/common/Button";
+import Input from "../../components/common/Input";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -56,32 +57,22 @@ const LoginPage = () => {
           </div>
           <h2 className="text-3xl font-bold mb-6 text-black text-center">Sign in to SparkLink</h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-black mb-1">Email</label>
-              <input
-                type="email"
-                {...register("email")}
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary bg-white text-black ${errors.email ? "border-error" : "border-gray-300"}`}
-                autoComplete="email"
-                disabled={isSubmitting}
-              />
-              {errors.email && (
-                <span className="text-xs text-error">{errors.email.message}</span>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-black mb-1">Password</label>
-              <input
-                type="password"
-                {...register("password")}
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary bg-white text-black ${errors.password ? "border-error" : "border-gray-300"}`}
-                autoComplete="current-password"
-                disabled={isSubmitting}
-              />
-              {errors.password && (
-                <span className="text-xs text-error">{errors.password.message}</span>
-              )}
-            </div>
+            <Input
+              label="Email"
+              type="email"
+              autoComplete="email"
+              disabled={isSubmitting}
+              error={errors.email?.message}
+              {...register("email")}
+            />
+            <Input
+              label="Password"
+              type="password"
+              autoComplete="current-password"
+              disabled={isSubmitting}
+              error={errors.password?.message}
+              {...register("password")}
+            />
             {error && (
               <div className="text-error text-sm text-center">{error}</div>
             )}

@@ -9,6 +9,7 @@ import Button from "../../components/common/Button";
 import Logo from "../../components/common/Logo";
 import OTPImage from "../../assets/otp.svg";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import Input from "../../components/common/Input";
 
 const otpSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -81,35 +82,26 @@ const VerifyEmailPage = () => {
           </div>
           <h2 className="text-3xl font-bold mb-6 text-black text-center">Verify your email</h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-black mb-1">Email</label>
-              <input
-                type="email"
-                {...register("email")}
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary bg-white text-black ${errors.email ? "border-error" : "border-gray-300"}`}
-                autoComplete="email"
-                disabled={!!emailFromState || isSubmitting}
-                onChange={e => setValue("email", e.target.value)}
-              />
-              {errors.email && (
-                <span className="text-xs text-error">{errors.email.message}</span>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-black mb-1">Verification Code</label>
-              <input
-                type="text"
-                {...register("otp")}
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary bg-white text-black tracking-widest text-center text-lg font-mono ${errors.otp ? "border-error" : "border-gray-300"}`}
-                autoComplete="one-time-code"
-                maxLength={6}
-                inputMode="numeric"
-                disabled={isSubmitting}
-              />
-              {errors.otp && (
-                <span className="text-xs text-error">{errors.otp.message}</span>
-              )}
-            </div>
+            <Input
+              label="Email"
+              type="email"
+              autoComplete="email"
+              disabled={!!emailFromState || isSubmitting}
+              error={errors.email?.message}
+              {...register("email")}
+              onChange={e => setValue("email", e.target.value)}
+            />
+            <Input
+              label="Verification Code"
+              type="text"
+              autoComplete="one-time-code"
+              maxLength={6}
+              inputMode="numeric"
+              disabled={isSubmitting}
+              error={errors.otp?.message}
+              className="tracking-widest text-center text-lg font-mono"
+              {...register("otp")}
+            />
             {error && (
               <div className="text-error text-sm text-center">{error}</div>
             )}

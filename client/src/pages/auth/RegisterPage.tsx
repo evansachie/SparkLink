@@ -8,6 +8,7 @@ import { registerUser } from "../../services/api/auth";
 import Logo from "../../components/common/Logo";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import Button from "../../components/common/Button";
+import Input from "../../components/common/Input";
 
 const registerSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -68,45 +69,30 @@ const RegisterPage = () => {
           </div>
           <h2 className="text-3xl font-bold mb-6 text-black text-center">Create your SparkLink account</h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-black mb-1">Email</label>
-              <input
-                type="email"
-                {...register("email")}
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary bg-white text-black ${errors.email ? "border-error" : "border-gray-300"}`}
-                autoComplete="email"
-                disabled={isSubmitting}
-              />
-              {errors.email && (
-                <span className="text-xs text-error">{errors.email.message}</span>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-black mb-1">Password</label>
-              <input
-                type="password"
-                {...register("password")}
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary bg-white text-black ${errors.password ? "border-error" : "border-gray-300"}`}
-                autoComplete="new-password"
-                disabled={isSubmitting}
-              />
-              {errors.password && (
-                <span className="text-xs text-error">{errors.password.message}</span>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-black mb-1">Confirm Password</label>
-              <input
-                type="password"
-                {...register("confirmPassword")}
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary bg-white text-black ${errors.confirmPassword ? "border-error" : "border-gray-300"}`}
-                autoComplete="new-password"
-                disabled={isSubmitting}
-              />
-              {errors.confirmPassword && (
-                <span className="text-xs text-error">{errors.confirmPassword.message}</span>
-              )}
-            </div>
+            <Input
+              label="Email"
+              type="email"
+              autoComplete="email"
+              disabled={isSubmitting}
+              error={errors.email?.message}
+              {...register("email")}
+            />
+            <Input
+              label="Password"
+              type="password"
+              autoComplete="new-password"
+              disabled={isSubmitting}
+              error={errors.password?.message}
+              {...register("password")}
+            />
+            <Input
+              label="Confirm Password"
+              type="password"
+              autoComplete="new-password"
+              disabled={isSubmitting}
+              error={errors.confirmPassword?.message}
+              {...register("confirmPassword")}
+            />
             {error && (
               <div className="text-error text-sm text-center">{error}</div>
             )}
