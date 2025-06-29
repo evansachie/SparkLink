@@ -139,7 +139,8 @@ export default function DashboardHome() {
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 md:p-10">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-white via-white to-gray-200 bg-clip-text text-transparent mb-2 drop-shadow">
-                {getGreeting()}{user?.firstName ? `, ${user.firstName}` : ""}! 👋
+                {getGreeting()}{user?.firstName ? `, ${user.firstName}` : ""}! 
+                <span className="text-black">👋 </span>
               </h1>
               <p className="text-white/90 text-lg font-medium drop-shadow">
                 Welcome back to your SparkLink dashboard. Ready to shine today?
