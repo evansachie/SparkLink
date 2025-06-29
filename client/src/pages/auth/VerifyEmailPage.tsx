@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -10,6 +10,7 @@ import Logo from "../../components/common/Logo";
 import OTPImage from "../../assets/otp.svg";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import Input from "../../components/common/Input";
+import { useAuth } from "../../context/AuthContext";
 
 const otpSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -37,6 +38,14 @@ const VerifyEmailPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [resendLoading, setResendLoading] = useState(false);
+  const { login, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    // Redirect to dashboard if already logged in
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const onSubmit = async (data: OtpFormInputs) => {
     setError(null);
@@ -44,7 +53,7 @@ const VerifyEmailPage = () => {
     try {
       const res = await verifyEmail(data);
       setSuccessMsg("Email verified! Redirecting...");
-      localStorage.setItem("token", res.token);
+      login(res.user, res.token);
       setTimeout(() => {
         navigate("/dashboard");
       }, 1200);
@@ -143,7 +152,7 @@ const VerifyEmailPage = () => {
         <img
           src={OTPImage}
           alt="OTP Illustration"
-          className="object-cover w-96 h-96 max-h-screen"
+          className="object-cover w-120 h-120 max-h-screen"
         />
       </motion.div>
     </div>

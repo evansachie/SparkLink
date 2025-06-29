@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +8,8 @@ import Logo from "../../components/common/Logo";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -26,13 +28,23 @@ const LoginPage = () => {
   });
 
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    // Redirect to dashboard if already logged in
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const onSubmit = async (data: LoginFormInputs) => {
     setError(null);
     try {
       const res = await loginApi(data);
-      localStorage.setItem("token", res.token);
-      window.location.href = "/dashboard";
+      // Store user and token in AuthContext and localStorage
+      login(res.user, res.token);
+      navigate("/dashboard", { replace: true });
     } catch (err: unknown) {
       setError(getErrorMessage(err, "Login failed. Please check your credentials."));
     }

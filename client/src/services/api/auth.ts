@@ -1,6 +1,17 @@
 import axios from "axios";
+export const API_URL = "https://sparklink.onrender.com/api";
 
-const API_URL = "https://sparklink.onrender.com/api";
+export interface User {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  country?: string;
+  profilePicture?: string;
+  subscription?: string;
+  [key: string]: unknown;
+}
 
 export interface LoginPayload {
   email: string;
@@ -9,14 +20,21 @@ export interface LoginPayload {
 
 export interface LoginResponse {
   token: string;
-  user: unknown;
+  user: User;
 }
 
 export const login = async (data: LoginPayload): Promise<LoginResponse> => {
   const res = await axios.post(`${API_URL}/auth/login`, data, {
     withCredentials: true,
   });
-  return res.data.data;
+  const { token, user } = res.data.data;
+  // Persist token and user in localStorage for session persistence
+  localStorage.setItem("token", String(token));
+  localStorage.setItem("user", JSON.stringify(user));
+  return {
+    token: String(token),
+    user: user as User,
+  };
 };
 
 export interface RegisterPayload {
@@ -24,18 +42,29 @@ export interface RegisterPayload {
   password: string;
 }
 
-export const registerUser = async (data: RegisterPayload) => {
+export interface RegisterResponse {
+  token?: string;
+  user?: User;
+  [key: string]: unknown;
+}
+
+export const registerUser = async (data: RegisterPayload): Promise<RegisterResponse> => {
   const res = await axios.post(`${API_URL}/auth/register`, data, {
     withCredentials: true,
   });
-  return res.data.data;
+  // If registration returns token/user, persist them
+  if (res.data.data?.token && res.data.data?.user) {
+    localStorage.setItem("token", String(res.data.data.token));
+    localStorage.setItem("user", JSON.stringify(res.data.data.user));
+  }
+  return res.data.data as RegisterResponse;
 };
 
 export async function verifyEmail(data: { email: string; otp: string }) {
   const res = await axios.post(`${API_URL}/auth/verify-email`, data, {
     withCredentials: true,
   });
-  return res.data.data;
+  return res.data.data as { token: string; user: User };
 }
 
 export async function resendVerification(data: { email: string }) {
@@ -44,5 +73,3 @@ export async function resendVerification(data: { email: string }) {
   });
   return res.data;
 }
-
-// ...add other auth-related API functions as needed...

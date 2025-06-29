@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -9,6 +9,7 @@ import Logo from "../../components/common/Logo";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
+import { useAuth } from "../../context/AuthContext";
 
 const registerSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -23,6 +24,7 @@ type RegisterFormInputs = z.infer<typeof registerSchema>;
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
   const {
     register,
     handleSubmit,
@@ -35,11 +37,24 @@ const RegisterPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
   const onSubmit = async (data: RegisterFormInputs) => {
     setError(null);
     setSuccessMsg(null);
     try {
-      await registerUser({ email: data.email, password: data.password });
+      const res = await registerUser({ email: data.email, password: data.password });
+      // Optionally auto-login after registration (if backend returns token & user)
+      if (res.token && res.user) {
+        login(res.user, res.token);
+        navigate("/dashboard", { replace: true });
+        return;
+      }
       setSuccessMsg("Registration successful! Please check your email for the verification code.");
       reset();
       setTimeout(() => {
