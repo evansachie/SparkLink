@@ -65,6 +65,7 @@ const sidebarLinks = [
 export default function Sidebar() {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const { user, logout } = useAuth();
 
   // Close sidebar on route change (mobile)
@@ -117,67 +118,143 @@ export default function Sidebar() {
 
   // Sidebar content for reuse
   const sidebarContent = (
-    <div className="h-full flex flex-col bg-white border-r border-gray-100">
+    <div className={`h-full flex flex-col bg-white border-r border-gray-100 transition-all duration-300 ${collapsed ? 'w-20' : 'w-72'}`}>
       {/* Header */}
       <motion.div
-        className="p-6 border-b border-gray-100"
+        className="p-6 border-b border-gray-100 flex flex-col items-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <motion.div
-          className="flex items-center justify-center mb-6"
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 400, damping: 10 }}
-        >
-          <Logo size={40} />
-        </motion.div>
+        {/* Toggle Button */}
+        <div className="w-full flex justify-between items-center mb-6">
+          <motion.div
+            className={`flex items-center justify-center transition-all duration-300 ${collapsed ? 'w-full' : ''}`}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+          >
+            <Logo size={collapsed ? 32 : 40} />
+          </motion.div>
+          
+          {!collapsed && (
+            <motion.button
+              onClick={() => setCollapsed(!collapsed)}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              title="Collapse sidebar"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+              </svg>
+            </motion.button>
+          )}
+          
+          {collapsed && (
+            <motion.button
+              onClick={() => setCollapsed(!collapsed)}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 z-10"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              title="Expand sidebar"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+              </svg>
+            </motion.button>
+          )}
+        </div>
 
         {/* User Info */}
-        <motion.div
-          className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors"
-          whileHover={{ scale: 1.02 }}
-          transition={{ type: "spring", stiffness: 400, damping: 10 }}
-        >
-          {avatarSrc ? (
-            <img
-              src={avatarSrc}
-              alt="User"
-              className="w-10 h-10 rounded-full object-cover border-2 border-primary/30"
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <span className="text-white font-semibold text-sm">
-                {displayName.charAt(0).toUpperCase()}
-              </span>
-            </div>
-          )}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1">
-              <p className="text-gray-900 font-medium text-sm truncate">
-                {displayName}
-              </p>
-              {hasVerifiedBadge && (
-                <MdVerified className="text-primary w-4 h-4 flex-shrink-0" />
+        <AnimatePresence>
+          {!collapsed && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors w-full"
+              whileHover={{ scale: 1.02 }}
+            >
+              {avatarSrc ? (
+                <img
+                  src={avatarSrc}
+                  alt="User"
+                  className="w-10 h-10 rounded-full object-cover border-2 border-primary/30"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">
+                    {displayName.charAt(0).toUpperCase()}
+                  </span>
+                </div>
               )}
-            </div>
-            <p className="text-gray-500 text-xs">
-              {userSubscription} Plan
-            </p>
-          </div>
-        </motion.div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1">
+                  <p className="text-gray-900 font-medium text-sm truncate">
+                    {displayName}
+                  </p>
+                  {hasVerifiedBadge && (
+                    <MdVerified className="text-primary w-4 h-4 flex-shrink-0" />
+                  )}
+                </div>
+                <p className="text-gray-500 text-xs">
+                  {userSubscription} Plan
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        {/* Collapsed User Avatar */}
+        <AnimatePresence>
+          {collapsed && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
+              className="flex items-center justify-center p-2 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors"
+              whileHover={{ scale: 1.1 }}
+              title={`${displayName} (${userSubscription} Plan)`}
+            >
+              {avatarSrc ? (
+                <img
+                  src={avatarSrc}
+                  alt="User"
+                  className="w-8 h-8 rounded-full object-cover border-2 border-primary/30"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                  <span className="text-white font-semibold text-xs">
+                    {displayName.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        <motion.div
-          className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          Navigation
-        </motion.div>
+      <nav className={`flex-1 p-4 space-y-2 ${collapsed ? 'px-2' : ''}`}>
+        <AnimatePresence>
+          {!collapsed && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2"
+            >
+              Navigation
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
         {sidebarLinks.map((link, index) => {
           const active = isActive(link.to);
           return (
@@ -193,7 +270,8 @@ export default function Sidebar() {
                   active
                     ? "bg-primary/10 text-primary border border-primary/20 shadow-sm"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
+                } ${collapsed ? 'justify-center' : ''}`}
+                title={collapsed ? `${link.label} - ${link.description}` : undefined}
               >
                 {active && (
                   <motion.div
@@ -209,13 +287,25 @@ export default function Sidebar() {
                 >
                   {link.icon}
                 </motion.div>
-                <div className="flex-1 relative z-10">
-                  <div className="font-medium">{link.label}</div>
-                  <div className="text-xs text-gray-400 group-hover:text-gray-500">
-                    {link.description}
-                  </div>
-                </div>
-                {active && (
+                
+                <AnimatePresence>
+                  {!collapsed && (
+                    <motion.div 
+                      className="flex-1 relative z-10"
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: "auto" }}
+                      exit={{ opacity: 0, width: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="font-medium">{link.label}</div>
+                      <div className="text-xs text-gray-400 group-hover:text-gray-500">
+                        {link.description}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                
+                {active && !collapsed && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -232,17 +322,20 @@ export default function Sidebar() {
 
       {/* Footer */}
       <motion.div
-        className="p-4 border-t border-gray-100"
+        className={`p-4 border-t border-gray-100 ${collapsed ? 'px-2' : ''}`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
       >
         <motion.button
           onClick={logout}
-          className="w-full flex items-center gap-3 px-3 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all duration-200 group"
+          className={`w-full flex items-center gap-3 px-3 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all duration-200 group ${
+            collapsed ? 'justify-center' : ''
+          }`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
+          title={collapsed ? "Sign Out" : undefined}
         >
           <motion.div
             className="group-hover:scale-110 transition-transform"
@@ -250,7 +343,18 @@ export default function Sidebar() {
           >
             <MdLogout size={20} />
           </motion.div>
-          <span>Sign Out</span>
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "auto" }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                Sign Out
+              </motion.span>
+            )}
+          </AnimatePresence>
         </motion.button>
       </motion.div>
     </div>
@@ -259,7 +363,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block w-72 h-screen sticky top-0 z-30">
+      <aside className={`hidden lg:block h-screen sticky top-0 z-30 transition-all duration-300 ${collapsed ? 'w-20' : 'w-72'}`}>
         {sidebarContent}
       </aside>
 
@@ -308,7 +412,140 @@ export default function Sidebar() {
               >
                 <MdClose size={24} />
               </motion.button>
-              {sidebarContent}
+              <div className="h-full flex flex-col bg-white border-r border-gray-100 w-72">
+                {/* Mobile sidebar uses full content without collapse functionality */}
+                <motion.div
+                  className="p-6 border-b border-gray-100"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <motion.div
+                    className="flex items-center justify-center mb-6"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  >
+                    <Logo size={40} />
+                  </motion.div>
+
+                  <motion.div
+                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  >
+                    {avatarSrc ? (
+                      <img
+                        src={avatarSrc}
+                        alt="User"
+                        className="w-10 h-10 rounded-full object-cover border-2 border-primary/30"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                        <span className="text-white font-semibold text-sm">
+                          {displayName.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1">
+                        <p className="text-gray-900 font-medium text-sm truncate">
+                          {displayName}
+                        </p>
+                        {hasVerifiedBadge && (
+                          <MdVerified className="text-primary w-4 h-4 flex-shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-gray-500 text-xs">
+                        {userSubscription} Plan
+                      </p>
+                    </div>
+                  </motion.div>
+                </motion.div>
+
+                <nav className="flex-1 p-4 space-y-2">
+                  <motion.div
+                    className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    Navigation
+                  </motion.div>
+                  {sidebarLinks.map((link, index) => {
+                    const active = isActive(link.to);
+                    return (
+                      <motion.div
+                        key={link.to}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 + index * 0.05 }}
+                      >
+                        <Link
+                          to={link.to}
+                          className={`group flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-all duration-200 relative overflow-hidden ${
+                            active
+                              ? "bg-primary/10 text-primary border border-primary/20 shadow-sm"
+                              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                          }`}
+                        >
+                          {active && (
+                            <motion.div
+                              layoutId="activeBackgroundMobile"
+                              className={`absolute inset-0 bg-gradient-to-r ${link.gradient} opacity-5 rounded-xl`}
+                              transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                            />
+                          )}
+                          <motion.div
+                            className={`relative z-10 ${active ? `text-primary` : ""}`}
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                          >
+                            {link.icon}
+                          </motion.div>
+                          <div className="flex-1 relative z-10">
+                            <div className="font-medium">{link.label}</div>
+                            <div className="text-xs text-gray-400 group-hover:text-gray-500">
+                              {link.description}
+                            </div>
+                          </div>
+                          {active && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                            >
+                              <MdKeyboardArrowRight className="w-5 h-5 text-primary/60" />
+                            </motion.div>
+                          )}
+                        </Link>
+                      </motion.div>
+                    );
+                  })}
+                </nav>
+
+                <motion.div
+                  className="p-4 border-t border-gray-100"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <motion.button
+                    onClick={logout}
+                    className="w-full flex items-center gap-3 px-3 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all duration-200 group"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  >
+                    <motion.div
+                      className="group-hover:scale-110 transition-transform"
+                      whileHover={{ rotate: 10 }}
+                    >
+                      <MdLogout size={20} />
+                    </motion.div>
+                    <span>Sign Out</span>
+                  </motion.button>
+                </motion.div>
+              </div>
             </motion.aside>
           </div>
         )}
