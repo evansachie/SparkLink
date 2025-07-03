@@ -5,6 +5,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import VerifyEmailPage from "./pages/auth/VerifyEmailPage";
 import DashboardLayout from "./layout/DashboardLayout";
 import DashboardHome from "./pages/dashboard/DashboardHome";
+import ProfilePage from "./pages/dashboard/ProfilePage";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { useEffect } from "react";
@@ -43,6 +44,7 @@ function App() {
                 <DashboardLayout>
                   <Routes>
                     <Route index element={<DashboardHome />} />
+                    <Route path="profile" element={<ProfilePage />} />
                   </Routes>
                 </DashboardLayout>
               </ProtectedRoute>
