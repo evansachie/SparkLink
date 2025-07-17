@@ -15,7 +15,6 @@ import { CreatePagePayload, UpdatePagePayload } from "../../services/api/pages";
 import Input from "../common/Input";
 import Button from "../common/Button";
 
-// Define PageType enum locally
 enum PageType {
   HOME = "HOME",
   ABOUT = "ABOUT",

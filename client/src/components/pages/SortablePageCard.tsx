@@ -12,7 +12,6 @@ import {
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-// Define PageType enum locally
 enum PageType {
   HOME = "HOME",
   ABOUT = "ABOUT",

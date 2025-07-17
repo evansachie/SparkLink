@@ -36,7 +36,6 @@ import PageEditor from "../../components/pages/PageEditor";
 import SortablePageCard from "../../components/pages/SortablePageCard";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 
-// Define PageType enum locally
 export enum PageType {
   HOME = "HOME",
   ABOUT = "ABOUT",

@@ -28,9 +28,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (storedToken && storedUser) {
       setToken(storedToken);
       try {
-        setUser(JSON.parse(storedUser));
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
+        console.log('Restored user session:', userData.email);
       } catch {
+        console.error('Failed to parse stored user data');
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
         setUser(null);
+        setToken(null);
       }
     }
     setLoading(false);
@@ -44,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    console.log('AuthContext: Logging out user');
     setUser(null);
     setToken(null);
     localStorage.removeItem("token");

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   MdPerson,
@@ -160,8 +160,41 @@ const recentActivity = [
 ];
 
 export default function DashboardHome() {
-  const { user } = useAuth();
+  const { user, login } = useAuth();
+  const location = useLocation();
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Handle OAuth callback if coming from redirect
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const token = urlParams.get('token');
+    const isGoogle = urlParams.get('google');
+
+    if (token && isGoogle && !user) {
+      try {
+        // Decode the token to get user data
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        
+        if (payload.userId && payload.email) {
+          // Create a user object from the token payload
+          const userData = {
+            id: payload.userId,
+            email: payload.email
+          };
+          
+          // Log the user in with the token
+          login(userData, token);
+          
+          console.log('OAuth login successful from dashboard');
+          
+          // Clean up URL parameters
+          window.history.replaceState({}, document.title, "/dashboard");
+        }
+      } catch (error) {
+        console.error('Failed to process OAuth token from dashboard:', error);
+      }
+    }
+  }, [location.search, login, user]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000); // Update every minute

@@ -1,43 +1,36 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import DashboardLayout from "./layout/DashboardLayout";
+
+// Auth Pages
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
-import NotFoundPage from "./pages/NotFoundPage";
 import VerifyEmailPage from "./pages/auth/VerifyEmailPage";
-import DashboardLayout from "./layout/DashboardLayout";
+import OAuthCallback from "./components/auth/OAuthCallback";
+
+// Dashboard Pages
 import DashboardHome from "./pages/dashboard/DashboardHome";
 import ProfilePage from "./pages/dashboard/ProfilePage";
 import PagesPage from "./pages/dashboard/PagesPage";
-import { AuthProvider, useAuth } from "./context/AuthContext";
-import ProtectedRoute from "./routes/ProtectedRoute";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
-function RedirectHome() {
-  const { isAuthenticated, loading } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!loading) {
-      if (isAuthenticated) {
-        navigate("/dashboard", { replace: true });
-      } else {
-        navigate("/login", { replace: true });
-      }
-    }
-  }, [isAuthenticated, loading, navigate]);
-
-  return null;
-}
+// Other Pages
+import NotFoundPage from "./pages/NotFoundPage";
+import RedirectHome from "./components/common/RedirectHome";
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<RedirectHome />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/oauth/callback" element={<OAuthCallback />} />
+
+          {/* Protected Dashboard Routes */}
           <Route
             path="/dashboard/*"
             element={
@@ -52,6 +45,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Fallback */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>
@@ -60,3 +55,4 @@ function App() {
 }
 
 export default App;
+

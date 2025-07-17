@@ -10,7 +10,6 @@ import {
   MdContentCopy,
 } from "react-icons/md";
 
-// Define PageType enum locally to avoid import issues
 enum PageType {
   HOME = "HOME",
   ABOUT = "ABOUT",

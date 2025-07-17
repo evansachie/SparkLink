@@ -41,11 +41,49 @@ const VerifyEmailPage = () => {
   const { login, isAuthenticated } = useAuth();
 
   useEffect(() => {
+    // Check for Google OAuth token in URL parameters
+    const urlParams = new URLSearchParams(location.search);
+    const token = urlParams.get('token');
+    const isGoogle = urlParams.get('google');
+    const isNewUser = urlParams.get('new_user');
+
+    if (token && isGoogle) {
+      // Handle Google OAuth callback
+      try {
+        // Decode and verify the token contains user data
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        
+        if (payload.userId && payload.email) {
+          // Create a user object from the token payload
+          const user = {
+            id: payload.userId,
+            email: payload.email
+          };
+          
+          login(user, token);
+          
+          if (isNewUser === 'true') {
+            setSuccessMsg("Google account linked successfully! Redirecting to dashboard...");
+          } else {
+            setSuccessMsg("Google login successful! Redirecting to dashboard...");
+          }
+          
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 1500);
+          return;
+        }
+      } catch (error) {
+        console.error('Failed to process Google OAuth token:', error);
+        setError("Failed to process Google authentication. Please try again.");
+      }
+    }
+
     // Redirect to dashboard if already logged in
     if (isAuthenticated) {
       navigate("/dashboard", { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, location.search, login]);
 
   const onSubmit = async (data: OtpFormInputs) => {
     setError(null);
@@ -142,6 +180,7 @@ const VerifyEmailPage = () => {
           </div>
         </div>
       </motion.div>
+      
       {/* Right: Image */}
       <motion.div
         className="hidden md:flex flex-1 items-center justify-center bg-gray-100"
