@@ -1,12 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuth } from "../../context/AuthContext";
 import { login as loginApi } from "../../services/api/auth";
-import Logo from "../../components/common/Logo";
 import { getErrorMessage } from "../../utils/getErrorMessage";
-import Button from "../../components/common/Button";
+import AuthLayout from "../../components/auth/AuthLayout";
+import AuthHeader from "../../components/auth/shared/AuthHeader";
+import OAuthButton from "../../components/auth/OAuthButton";
+import { OAuthDivider } from "../../components/common/OAuthDivider";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Alert, AlertDescription } from "../../components/ui/alert";
+import { Card, CardContent } from "../../components/ui/card";
+import { Label } from "../../components/ui/label";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -15,7 +24,11 @@ const loginSchema = z.object({
 
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
-const LoginPage = () => {
+export default function LoginPage() {
+  const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -24,124 +37,124 @@ const LoginPage = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const onSubmit = async (data: LoginFormInputs) => {
     setError(null);
     try {
       const res = await loginApi(data);
-      localStorage.setItem("token", res.token);
-      window.location.href = "/dashboard";
+      login(res.user, res.token);
+      navigate("/dashboard", { replace: true });
     } catch (err: unknown) {
       setError(getErrorMessage(err, "Login failed. Please check your credentials."));
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${"https://sparklink.onrender.com/api"}/auth/google`;
-  };
-
   return (
-    <div className="min-h-screen flex bg-white">
-      {/* Left: Form */}
-      <motion.div
-        className="flex-1 flex flex-col justify-center items-center px-8 py-12"
-        initial={{ opacity: 0, x: -40 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="w-full max-w-md">
-          <div className="flex items-center justify-center mb-8">
-            <Logo size={64} />
-          </div>
-          <h2 className="text-3xl font-bold mb-6 text-black text-center">Sign in to SparkLink</h2>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-black mb-1">Email</label>
-              <input
-                type="email"
-                {...register("email")}
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary bg-white text-black ${errors.email ? "border-error" : "border-gray-300"}`}
-                autoComplete="email"
-                disabled={isSubmitting}
-              />
-              {errors.email && (
-                <span className="text-xs text-error">{errors.email.message}</span>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-black mb-1">Password</label>
-              <input
-                type="password"
-                {...register("password")}
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary bg-white text-black ${errors.password ? "border-error" : "border-gray-300"}`}
-                autoComplete="current-password"
-                disabled={isSubmitting}
-              />
-              {errors.password && (
-                <span className="text-xs text-error">{errors.password.message}</span>
-              )}
-            </div>
-            {error && (
-              <div className="text-error text-sm text-center">{error}</div>
-            )}
-            <Button
-              type="submit"
-              loading={isSubmitting}
-              className="mt-2"
-            >
-              {isSubmitting ? "Signing in..." : "Sign In"}
-            </Button>
-          </form>
-          <div className="my-4 flex items-center">
-            <div className="flex-grow border-t border-gray-200"></div>
-            <span className="mx-2 text-gray-400 text-xs">OR</span>
-            <div className="flex-grow border-t border-gray-200"></div>
-          </div>
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            whileHover={{ scale: 1.03 }}
-            onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center bg-white border border-gray-300 hover:bg-primary/10 text-black font-semibold py-2 rounded transition"
-            type="button"
-          >
-            <img
-              src="https://www.svgrepo.com/show/475656/google-color.svg"
-              alt="Google"
-              className="w-5 h-5 mr-2"
-            />
-            Sign in with Google
-          </motion.button>
-          <div className="mt-6 text-center">
-            <a href="/forgot-password" className="text-sm text-primary hover:underline">
-              Forgot password?
-            </a>
-          </div>
-          <div className="mt-2 text-center text-sm">
-            <span className="text-gray-500">
-              Don't have an account?{" "}
-              <a href="/register" className="text-primary hover:underline">
-                Sign up
-              </a>
-            </span>
-          </div>
-        </div>
-      </motion.div>
-      {/* Right: Image */}
-      <motion.div
-        className="hidden md:flex flex-1 items-center justify-center bg-gray-100"
-        initial={{ opacity: 0, x: 40 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <img
-          src="/login.svg"
-          alt="Placeholder"
-          className="object-cover w-160 h-160 max-h-screen"
-        />
-      </motion.div>
-    </div>
-  );
-};
+    <AuthLayout 
+      illustration="/login.jpg" 
+      illustrationAlt="Login illustration"
+      illustrationText="Welcome back to SparkLink"
+      illustrationDescription="Sign in to continue building your portfolio and connecting with the community."
+    >
+      <AuthHeader 
+        title="Welcome back" 
+        subtitle="Sign in to your SparkLink account" 
+      />
 
-export default LoginPage;
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        <Card className="shadow-xl border-0 bg-card/50 backdrop-blur-sm">
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    disabled={isSubmitting}
+                    placeholder="you@example.com"
+                    {...register("email")}
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{errors.email.message}</p>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    autoComplete="current-password"
+                    disabled={isSubmitting}
+                    placeholder="••••••••"
+                    {...register("password")}
+                  />
+                  {errors.password && (
+                    <p className="text-sm text-destructive">{errors.password.message}</p>
+                  )}
+                </div>
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-11 text-base font-medium pulse-glow"
+              >
+                {isSubmitting ? "Signing in..." : "Sign In"}
+              </Button>
+            </form>
+
+            <div className="mt-6">
+              <OAuthDivider />
+            </div>
+
+            <div className="mt-6">
+              <OAuthButton 
+                provider="google" 
+                action="login" 
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="mt-6 space-y-4 text-center text-sm">
+              <Link 
+                to="/forgot-password" 
+                className="text-primary hover:text-primary/80 hover:underline transition-colors"
+              >
+                Forgot password?
+              </Link>
+              
+              <p className="text-muted-foreground">
+                Don't have an account?{" "}
+                <Link 
+                  to="/register" 
+                  className="text-primary hover:text-primary/80 hover:underline transition-colors font-medium"
+                >
+                  Sign up
+                </Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </AuthLayout>
+  );
+}
+

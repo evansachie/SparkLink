@@ -4,11 +4,13 @@ import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import prisma from './database';
 import { JWTPayload } from '../types';
 
-// Google OAuth Strategy
+// Google OAuth Strategy with proper callback URL configuration
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID!,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-  callbackURL: "/api/auth/google/callback"
+  callbackURL: process.env.NODE_ENV === 'production' 
+    ? "https://sparklink.onrender.com/api/auth/google/callback"
+    : "http://localhost:3001/api/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     // Check if user already exists with this Google ID
@@ -53,14 +55,17 @@ passport.use(new GoogleStrategy({
           firstName,
           lastName,
           profilePicture: profile.photos?.[0]?.value,
-          isVerified: true
+          isVerified: true,
+          subscription: 'STARTER' // Default subscription
         }
       });
       return done(null, user);
     }
 
+    console.error('No email provided by Google');
     return done(new Error('No email provided by Google'), false);
   } catch (error) {
+    console.error('Google OAuth error:', error);
     return done(error, false);
   }
 }));

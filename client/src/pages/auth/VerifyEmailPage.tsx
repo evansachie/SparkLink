@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -9,6 +9,8 @@ import Button from "../../components/common/Button";
 import Logo from "../../components/common/Logo";
 import OTPImage from "../../assets/otp.svg";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import Input from "../../components/common/Input";
+import { useAuth } from "../../context/AuthContext";
 
 const otpSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -36,6 +38,52 @@ const VerifyEmailPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [resendLoading, setResendLoading] = useState(false);
+  const { login, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    // Check for Google OAuth token in URL parameters
+    const urlParams = new URLSearchParams(location.search);
+    const token = urlParams.get('token');
+    const isGoogle = urlParams.get('google');
+    const isNewUser = urlParams.get('new_user');
+
+    if (token && isGoogle) {
+      // Handle Google OAuth callback
+      try {
+        // Decode and verify the token contains user data
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        
+        if (payload.userId && payload.email) {
+          // Create a user object from the token payload
+          const user = {
+            id: payload.userId,
+            email: payload.email
+          };
+          
+          login(user, token);
+          
+          if (isNewUser === 'true') {
+            setSuccessMsg("Google account linked successfully! Redirecting to dashboard...");
+          } else {
+            setSuccessMsg("Google login successful! Redirecting to dashboard...");
+          }
+          
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 1500);
+          return;
+        }
+      } catch (error) {
+        console.error('Failed to process Google OAuth token:', error);
+        setError("Failed to process Google authentication. Please try again.");
+      }
+    }
+
+    // Redirect to dashboard if already logged in
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate, location.search, login]);
 
   const onSubmit = async (data: OtpFormInputs) => {
     setError(null);
@@ -43,7 +91,7 @@ const VerifyEmailPage = () => {
     try {
       const res = await verifyEmail(data);
       setSuccessMsg("Email verified! Redirecting...");
-      localStorage.setItem("token", res.token);
+      login(res.user, res.token);
       setTimeout(() => {
         navigate("/dashboard");
       }, 1200);
@@ -81,35 +129,26 @@ const VerifyEmailPage = () => {
           </div>
           <h2 className="text-3xl font-bold mb-6 text-black text-center">Verify your email</h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-black mb-1">Email</label>
-              <input
-                type="email"
-                {...register("email")}
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary bg-white text-black ${errors.email ? "border-error" : "border-gray-300"}`}
-                autoComplete="email"
-                disabled={!!emailFromState || isSubmitting}
-                onChange={e => setValue("email", e.target.value)}
-              />
-              {errors.email && (
-                <span className="text-xs text-error">{errors.email.message}</span>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-black mb-1">Verification Code</label>
-              <input
-                type="text"
-                {...register("otp")}
-                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary bg-white text-black tracking-widest text-center text-lg font-mono ${errors.otp ? "border-error" : "border-gray-300"}`}
-                autoComplete="one-time-code"
-                maxLength={6}
-                inputMode="numeric"
-                disabled={isSubmitting}
-              />
-              {errors.otp && (
-                <span className="text-xs text-error">{errors.otp.message}</span>
-              )}
-            </div>
+            <Input
+              label="Email"
+              type="email"
+              autoComplete="email"
+              disabled={!!emailFromState || isSubmitting}
+              error={errors.email?.message}
+              {...register("email")}
+              onChange={e => setValue("email", e.target.value)}
+            />
+            <Input
+              label="Verification Code"
+              type="text"
+              autoComplete="one-time-code"
+              maxLength={6}
+              inputMode="numeric"
+              disabled={isSubmitting}
+              error={errors.otp?.message}
+              className="tracking-widest text-center text-lg font-mono"
+              {...register("otp")}
+            />
             {error && (
               <div className="text-error text-sm text-center">{error}</div>
             )}
@@ -141,6 +180,7 @@ const VerifyEmailPage = () => {
           </div>
         </div>
       </motion.div>
+      
       {/* Right: Image */}
       <motion.div
         className="hidden md:flex flex-1 items-center justify-center bg-gray-100"
@@ -151,7 +191,7 @@ const VerifyEmailPage = () => {
         <img
           src={OTPImage}
           alt="OTP Illustration"
-          className="object-cover w-96 h-96 max-h-screen"
+          className="object-cover w-120 h-120 max-h-screen"
         />
       </motion.div>
     </div>

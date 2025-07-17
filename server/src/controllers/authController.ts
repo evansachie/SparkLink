@@ -318,7 +318,11 @@ export const googleCallback = async (req: Request, res: Response) => {
     const user = req.user as any;
     
     if (!user) {
-      return res.redirect(`${process.env.CLIENT_URL}/auth/error?message=Authentication failed`);
+      console.error('Google callback - No user found');
+      const errorUrl = process.env.NODE_ENV === 'production'
+        ? 'https://sparklink-lyart.vercel.app/login?error=google_auth_failed'
+        : 'http://localhost:5173/login?error=google_auth_failed';
+      return res.redirect(errorUrl);
     }
 
     // Generate JWT token
@@ -330,14 +334,21 @@ export const googleCallback = async (req: Request, res: Response) => {
     // Check if user needs to complete profile
     const needsProfile = !user.firstName || !user.lastName || !user.username;
 
-    // Redirect to frontend with token
-    const redirectUrl = needsProfile 
-      ? `${process.env.CLIENT_URL}/onboarding?token=${token}&new_user=true`
-      : `${process.env.CLIENT_URL}/dashboard?token=${token}`;
+    // Determine redirect URL based on environment
+    const clientUrl = process.env.NODE_ENV === 'production'
+      ? 'https://sparklink-lyart.vercel.app'
+      : 'http://localhost:5173';
 
+    // Always redirect to OAuth callback handler first
+    const redirectUrl = `${clientUrl}/oauth/callback?token=${token}&google=true${needsProfile ? '&new_user=true' : ''}`;
+
+    console.log('Google callback - Redirecting to:', redirectUrl);
     res.redirect(redirectUrl);
   } catch (error) {
     console.error('Google callback error:', error);
-    res.redirect(`${process.env.CLIENT_URL}/auth/error?message=Authentication failed`);
+    const errorUrl = process.env.NODE_ENV === 'production'
+      ? 'https://sparklink-lyart.vercel.app/login?error=google_auth_error'
+      : 'http://localhost:5173/login?error=google_auth_error';
+    res.redirect(errorUrl);
   }
 };

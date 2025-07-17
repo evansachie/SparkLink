@@ -34,10 +34,10 @@ const NotFoundPage = () => (
       transition={{ delay: 0.4, duration: 0.5 }}
     >
       <Link
-        to="/login"
+        to="/"
         className="inline-block bg-primary hover:bg-black text-white font-semibold px-6 py-2 rounded transition"
       >
-        Go to Login
+        Go to Home
       </Link>
     </motion.div>
   </div>
