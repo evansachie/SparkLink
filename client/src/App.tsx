@@ -3,20 +3,19 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import DashboardLayout from "./layout/DashboardLayout";
 
-// Auth Pages
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import VerifyEmailPage from "./pages/auth/VerifyEmailPage";
 import OAuthCallback from "./components/auth/OAuthCallback";
 
-// Dashboard Pages
 import DashboardHome from "./pages/dashboard/DashboardHome";
 import ProfilePage from "./pages/dashboard/ProfilePage";
 import PagesPage from "./pages/dashboard/PagesPage";
 
-// Other Pages
 import NotFoundPage from "./pages/NotFoundPage";
 import RedirectHome from "./components/common/RedirectHome";
+import TermsPage from "./pages/legal/TermsPage";
+import PrivacyPage from "./pages/legal/PrivacyPage";
 
 function App() {
   return (
@@ -29,6 +28,10 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/oauth/callback" element={<OAuthCallback />} />
+
+          {/* Legal Routes */}
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
 
           {/* Protected Dashboard Routes */}
           <Route
@@ -55,4 +58,3 @@ function App() {
 }
 
 export default App;
-
