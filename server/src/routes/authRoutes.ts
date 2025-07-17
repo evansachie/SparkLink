@@ -12,11 +12,19 @@ router.post('/resend-verification', resendVerificationCode as any);
 
 // Google OAuth
 router.get('/google', 
-  passport.authenticate('google', { scope: ['profile', 'email'] })
+  passport.authenticate('google', { 
+    scope: ['profile', 'email'],
+    session: true
+  })
 );
 
 router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: `${process.env.CLIENT_URL}/auth/error` }),
+  passport.authenticate('google', { 
+    failureRedirect: process.env.NODE_ENV === 'production'
+      ? 'https://sparklink-lyart.vercel.app/login?error=google_auth_failed'
+      : 'http://localhost:5173/login?error=google_auth_failed',
+    session: true
+  }),
   googleCallback as any
 );
 
