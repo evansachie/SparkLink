@@ -36,6 +36,11 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
+      // Check if we're in development mode
+      const isDevelopment = import.meta.env?.DEV || 
+                           import.meta.env?.MODE === 'development' || 
+                           !import.meta.env?.PROD;
+
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
           <div className="max-w-md w-full">
@@ -43,23 +48,23 @@ export class ErrorBoundary extends Component<Props, State> {
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
                 <MdError className="h-6 w-6 text-red-600" />
               </div>
-              
+             
               <h1 className="text-lg font-medium text-gray-900 mb-2">
                 Something went wrong
               </h1>
-              
+             
               <p className="text-sm text-gray-600 mb-6">
                 We're sorry, but something unexpected happened. Please try refreshing the page.
               </p>
 
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {isDevelopment && this.state.error && (
                 <div className="bg-gray-100 rounded-md p-3 mb-4 text-left">
                   <p className="text-xs text-gray-700 font-mono">
                     {this.state.error.message}
                   </p>
                 </div>
               )}
-              
+             
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={this.handleReset}
@@ -68,7 +73,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   <MdRefresh className="h-4 w-4 mr-2" />
                   Try again
                 </button>
-                
+               
                 <button
                   onClick={() => window.location.reload()}
                   className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
