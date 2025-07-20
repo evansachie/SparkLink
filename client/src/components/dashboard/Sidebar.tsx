@@ -68,6 +68,27 @@ const sidebarLinks = [
     description: "Account preferences",
     gradient: "from-gray-500 to-gray-600",
   },
+  {
+    to: "/dashboard/templates",
+    label: "Templates",
+    icon: <MdPages size={22} />,
+    description: "Design templates",
+    gradient: "from-teal-500 to-teal-600",
+  },
+  {
+    to: "/dashboard/resume",
+    label: "Resume",
+    icon: <MdPerson size={22} />,
+    description: "Create & manage resume",
+    gradient: "from-yellow-500 to-yellow-600",
+  },
+  {
+    to: "/dashboard/verification",
+    label: "Verification",
+    icon: <MdVerified size={22} />,
+    description: "Verify your identity",
+    gradient: "from-red-500 to-red-600",
+  },
 ];
 
 export default function Sidebar() {
