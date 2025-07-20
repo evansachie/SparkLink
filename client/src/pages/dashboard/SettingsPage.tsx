@@ -7,14 +7,21 @@ import {
   MdPalette,
   MdDelete,
   MdVisibility,
+  MdCreditCard,
 } from "react-icons/md";
 
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../hooks/useToast";
+import { 
+  getCurrentSubscription, 
+  cancelSubscription,
+  CurrentSubscription,
+} from "../../services/api/subscription";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Card, CardContent } from "../../components/ui/card";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 interface SettingsSectionProps {
   title: string;
@@ -45,8 +52,13 @@ function SettingsSection({ title, description, icon, children }: SettingsSection
 export default function SettingsPage() {
   const { user, logout } = useAuth();
   const { success, error } = useToast();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  
+  // Subscription data
+  const [currentSubscription, setCurrentSubscription] = useState<CurrentSubscription | null>(null);
   
   // Form states
   const [notifications, setNotifications] = useState({
@@ -62,6 +74,40 @@ export default function SettingsPage() {
   });
 
   const [deleteAccountInput, setDeleteAccountInput] = useState("");
+
+  // Load subscription data
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const subscriptionData = await getCurrentSubscription();
+        setCurrentSubscription(subscriptionData);
+      } catch (err) {
+        console.error('Failed to load subscription data:', err);
+        error('Failed to load subscription data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [error]);
+
+  const handleCancelSubscription = async () => {
+    try {
+      setActionLoading(true);
+      await cancelSubscription();
+      success('Subscription cancelled successfully');
+      // Refresh subscription data
+      const subscriptionData = await getCurrentSubscription();
+      setCurrentSubscription(subscriptionData);
+    } catch {
+      error('Failed to cancel subscription');
+    } finally {
+      setActionLoading(false);
+      setShowCancelConfirm(false);
+    }
+  };
 
   useEffect(() => {
     // Load user settings from API when implemented
@@ -176,6 +222,77 @@ export default function SettingsPage() {
               </p>
             </div>
           </div>
+        </SettingsSection>
+
+        {/* Subscription Management */}
+        <SettingsSection
+          title="Subscription Management"
+          description="Manage your subscription plan and billing"
+          icon={<MdCreditCard size={20} className="text-primary" />}
+        >
+          {loading ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600">Loading subscription data...</p>
+            </div>
+          ) : currentSubscription ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-medium text-gray-900">Current Plan</h3>
+                  <p className="text-sm text-gray-600 capitalize">
+                    {currentSubscription.plan.name}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">Status</h3>
+                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                    currentSubscription.status === 'active' 
+                      ? 'bg-green-100 text-green-800'
+                      : currentSubscription.status === 'canceled'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {currentSubscription.status}
+                  </span>
+                </div>
+                {currentSubscription.currentPeriodEnd && (
+                  <div>
+                    <h3 className="font-medium text-gray-900">
+                      {currentSubscription.status === 'active' ? 'Next Billing' : 'Expires'}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      {new Date(currentSubscription.currentPeriodEnd).toLocaleDateString()}
+                    </p>
+                  </div>
+                )}
+                <div>
+                  <h3 className="font-medium text-gray-900">Amount</h3>
+                  <p className="text-sm text-gray-600">
+                    ₦{currentSubscription.plan.price.toLocaleString()}/{currentSubscription.plan.interval}
+                  </p>
+                </div>
+              </div>
+              
+              {currentSubscription.status === 'active' && (
+                <div className="pt-4 border-t">
+                  <Button
+                    variant="destructive"
+                    onClick={() => setShowCancelConfirm(true)}
+                    disabled={actionLoading}
+                  >
+                    Cancel Subscription
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-600 mb-4">You don't have an active subscription</p>
+              <Button onClick={() => window.location.href = '/dashboard/subscription'}>
+                View Plans
+              </Button>
+            </div>
+          )}
         </SettingsSection>
 
         {/* Notification Settings */}
@@ -382,6 +499,18 @@ export default function SettingsPage() {
           </div>
         </SettingsSection>
       </div>
+
+      {/* Subscription Cancellation Confirmation */}
+      <ConfirmDialog
+        isOpen={showCancelConfirm}
+        onCancel={() => setShowCancelConfirm(false)}
+        onConfirm={handleCancelSubscription}
+        title="Cancel Subscription"
+        message="Are you sure you want to cancel your subscription? You'll continue to have access until the end of your billing period."
+        confirmText="Cancel Subscription"
+        type="danger"
+        loading={actionLoading}
+      />
     </div>
   );
 }
