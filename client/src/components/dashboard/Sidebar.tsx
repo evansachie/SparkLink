@@ -6,6 +6,7 @@ import {
   MdPages,
   MdPhotoLibrary,
   MdBarChart,
+  MdCreditCard,
   MdSettings,
   MdLogout,
   MdClose,
@@ -52,6 +53,13 @@ const sidebarLinks = [
     icon: <MdBarChart size={22} />,
     description: "Performance insights",
     gradient: "from-orange-500 to-orange-600",
+  },
+  {
+    to: "/dashboard/subscription",
+    label: "Subscription",
+    icon: <MdCreditCard size={22} />,
+    description: "Plans & billing",
+    gradient: "from-indigo-500 to-indigo-600",
   },
   {
     to: "/dashboard/settings",

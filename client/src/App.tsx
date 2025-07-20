@@ -15,6 +15,7 @@ import ProfilePage from "./pages/dashboard/ProfilePage";
 import PagesPage from "./pages/dashboard/PagesPage";
 import GalleryPage from "./pages/dashboard/GalleryPage";
 import AnalyticsPage from "./pages/dashboard/AnalyticsPage";
+import SubscriptionPage from "./pages/dashboard/SubscriptionPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 
 import NotFoundPage from "./pages/NotFoundPage";
@@ -52,6 +53,7 @@ function App() {
                         <Route path="pages" element={<PagesPage />} />
                         <Route path="gallery" element={<GalleryPage />} />
                         <Route path="analytics" element={<AnalyticsPage />} />
+                        <Route path="subscription" element={<SubscriptionPage />} />
                         <Route path="settings" element={<SettingsPage />} />
                       </Routes>
                     </DashboardLayout>
