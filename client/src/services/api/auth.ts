@@ -73,3 +73,17 @@ export async function resendVerification(data: { email: string }) {
   });
   return res.data;
 }
+
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+export const deleteAccount = async (): Promise<void> => {
+  await axios.delete(`${API_URL}/auth/account`, {
+    headers: getAuthHeaders(),
+  });
+  // Clear local storage after successful deletion
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+};

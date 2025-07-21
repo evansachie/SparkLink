@@ -6,6 +6,7 @@ import {
   MdPages,
   MdPhotoLibrary,
   MdBarChart,
+  MdCreditCard,
   MdSettings,
   MdLogout,
   MdClose,
@@ -54,11 +55,39 @@ const sidebarLinks = [
     gradient: "from-orange-500 to-orange-600",
   },
   {
+    to: "/dashboard/subscription",
+    label: "Subscription",
+    icon: <MdCreditCard size={22} />,
+    description: "Plans & billing",
+    gradient: "from-indigo-500 to-indigo-600",
+  },
+  {
     to: "/dashboard/settings",
     label: "Settings",
     icon: <MdSettings size={22} />,
     description: "Account preferences",
     gradient: "from-gray-500 to-gray-600",
+  },
+  {
+    to: "/dashboard/templates",
+    label: "Templates",
+    icon: <MdPages size={22} />,
+    description: "Design templates",
+    gradient: "from-teal-500 to-teal-600",
+  },
+  {
+    to: "/dashboard/resume",
+    label: "Resume",
+    icon: <MdPerson size={22} />,
+    description: "Create & manage resume",
+    gradient: "from-yellow-500 to-yellow-600",
+  },
+  {
+    to: "/dashboard/verification",
+    label: "Verification",
+    icon: <MdVerified size={22} />,
+    description: "Verify your identity",
+    gradient: "from-red-500 to-red-600",
   },
 ];
 
@@ -118,7 +147,7 @@ export default function Sidebar() {
 
   // Sidebar content for reuse
   const sidebarContent = (
-    <div className={`h-full flex flex-col bg-white border-r border-gray-100 transition-all duration-300 ${collapsed ? 'w-20' : 'w-72'}`}>
+    <div className={`h-full flex flex-col bg-white border-r border-gray-100 transition-all duration-300 ${collapsed ? 'w-20' : 'w-72'} overflow-hidden`}>
       {/* Header */}
       <motion.div
         className="p-6 border-b border-gray-100 flex flex-col items-center"
@@ -240,7 +269,7 @@ export default function Sidebar() {
       </motion.div>
 
       {/* Navigation */}
-      <nav className={`flex-1 p-4 space-y-2 ${collapsed ? 'px-2' : ''}`}>
+      <nav className={`flex-1 p-4 space-y-2 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 ${collapsed ? 'px-2' : ''}`}>
         <AnimatePresence>
           {!collapsed && (
             <motion.div
@@ -462,7 +491,7 @@ export default function Sidebar() {
                   </motion.div>
                 </motion.div>
 
-                <nav className="flex-1 p-4 space-y-2">
+                <nav className="flex-1 p-4 space-y-2 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
                   <motion.div
                     className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2"
                     initial={{ opacity: 0 }}
