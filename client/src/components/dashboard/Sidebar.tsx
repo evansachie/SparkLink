@@ -147,7 +147,7 @@ export default function Sidebar() {
 
   // Sidebar content for reuse
   const sidebarContent = (
-    <div className={`h-full flex flex-col bg-white border-r border-gray-100 transition-all duration-300 ${collapsed ? 'w-20' : 'w-72'}`}>
+    <div className={`h-full flex flex-col bg-white border-r border-gray-100 transition-all duration-300 ${collapsed ? 'w-20' : 'w-72'} overflow-hidden`}>
       {/* Header */}
       <motion.div
         className="p-6 border-b border-gray-100 flex flex-col items-center"
@@ -269,7 +269,7 @@ export default function Sidebar() {
       </motion.div>
 
       {/* Navigation */}
-      <nav className={`flex-1 p-4 space-y-2 ${collapsed ? 'px-2' : ''}`}>
+      <nav className={`flex-1 p-4 space-y-2 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 ${collapsed ? 'px-2' : ''}`}>
         <AnimatePresence>
           {!collapsed && (
             <motion.div
@@ -491,7 +491,7 @@ export default function Sidebar() {
                   </motion.div>
                 </motion.div>
 
-                <nav className="flex-1 p-4 space-y-2">
+                <nav className="flex-1 p-4 space-y-2 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
                   <motion.div
                     className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2"
                     initial={{ opacity: 0 }}
