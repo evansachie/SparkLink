@@ -24,70 +24,60 @@ const sidebarLinks = [
     label: "Overview",
     icon: <MdDashboard size={22} />,
     description: "Dashboard home",
-    gradient: "from-blue-500 to-blue-600",
   },
   {
     to: "/dashboard/profile",
     label: "Profile",
     icon: <MdPerson size={22} />,
     description: "Personal information",
-    gradient: "from-purple-500 to-purple-600",
   },
   {
     to: "/dashboard/pages",
     label: "Pages",
     icon: <MdPages size={22} />,
     description: "Create & manage pages",
-    gradient: "from-green-500 to-green-600",
   },
   {
     to: "/dashboard/gallery",
     label: "Gallery",
     icon: <MdPhotoLibrary size={22} />,
     description: "Photos & media",
-    gradient: "from-pink-500 to-pink-600",
   },
   {
     to: "/dashboard/analytics",
     label: "Analytics",
     icon: <MdBarChart size={22} />,
     description: "Performance insights",
-    gradient: "from-orange-500 to-orange-600",
   },
   {
     to: "/dashboard/subscription",
     label: "Subscription",
     icon: <MdCreditCard size={22} />,
     description: "Plans & billing",
-    gradient: "from-indigo-500 to-indigo-600",
   },
   {
     to: "/dashboard/settings",
     label: "Settings",
     icon: <MdSettings size={22} />,
     description: "Account preferences",
-    gradient: "from-gray-500 to-gray-600",
   },
   {
     to: "/dashboard/templates",
     label: "Templates",
     icon: <MdPages size={22} />,
     description: "Design templates",
-    gradient: "from-teal-500 to-teal-600",
   },
   {
     to: "/dashboard/resume",
     label: "Resume",
     icon: <MdPerson size={22} />,
     description: "Create & manage resume",
-    gradient: "from-yellow-500 to-yellow-600",
   },
   {
     to: "/dashboard/verification",
     label: "Verification",
     icon: <MdVerified size={22} />,
     description: "Verify your identity",
-    gradient: "from-red-500 to-red-600",
   },
 ];
 
@@ -305,7 +295,7 @@ export default function Sidebar() {
                 {active && (
                   <motion.div
                     layoutId="activeBackground"
-                    className={`absolute inset-0 bg-gradient-to-r ${link.gradient} opacity-5 rounded-xl`}
+                    className={`absolute inset-0 bg-gradient-to-r opacity-5 rounded-xl`}
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
@@ -520,7 +510,7 @@ export default function Sidebar() {
                           {active && (
                             <motion.div
                               layoutId="activeBackgroundMobile"
-                              className={`absolute inset-0 bg-gradient-to-r ${link.gradient} opacity-5 rounded-xl`}
+                              className={`absolute inset-0 bg-gradient-to-r opacity-5 rounded-xl`}
                               transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                             />
                           )}
