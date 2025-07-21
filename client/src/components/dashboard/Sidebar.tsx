@@ -390,7 +390,7 @@ export default function Sidebar() {
       <div className="lg:hidden">
         {!open && (
           <motion.button
-            className="fixed top-4 left-4 z-50 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-3 border border-gray-200"
+            className="fixed top-20 left-4 z-50 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-3 border border-gray-200"
             onClick={() => setOpen(true)}
             aria-label="Open sidebar"
             type="button"
@@ -422,7 +422,7 @@ export default function Sidebar() {
               className="absolute top-0 left-0 h-full w-80 max-w-[85vw] shadow-2xl"
             >
               <motion.button
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10 p-2 rounded-lg hover:bg-gray-100"
+                className="absolute top-4 right-6 text-gray-500 hover:text-gray-700 z-10 p-2 rounded-lg hover:bg-gray-100"
                 onClick={() => setOpen(false)}
                 aria-label="Close sidebar"
                 type="button"
