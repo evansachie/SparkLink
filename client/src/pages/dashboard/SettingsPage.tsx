@@ -17,6 +17,7 @@ import {
   cancelSubscription,
   CurrentSubscription,
 } from "../../services/api/subscription";
+import { deleteAccount } from "../../services/api/auth";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -131,8 +132,8 @@ export default function SettingsPage() {
 
     try {
       setLoading(true);
-      // TODO: Implement delete account API
-      success("Account deletion initiated");
+      await deleteAccount();
+      success("Account deleted successfully");
       logout();
     } catch {
       error("Failed to delete account");

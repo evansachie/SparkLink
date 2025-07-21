@@ -26,6 +26,10 @@ import RedirectHome from "./components/common/RedirectHome";
 import TermsPage from "./pages/legal/TermsPage";
 import PrivacyPage from "./pages/legal/PrivacyPage";
 
+import PublicProfilePage from "./pages/public/PublicProfilePage";
+import PublicPageView from "./pages/public/PublicPageView";
+import PublicGalleryView from "./pages/public/PublicGalleryView";
+
 function App() {
   return (
     <ErrorBoundary>
@@ -43,6 +47,11 @@ function App() {
               {/* Legal Routes */}
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
+
+              {/* Public Portfolio Routes */}
+              <Route path="/public/:username" element={<PublicProfilePage />} />
+              <Route path="/public/:username/pages/:slug" element={<PublicPageView />} />
+              <Route path="/public/:username/gallery" element={<PublicGalleryView />} />
 
               {/* Protected Dashboard Routes */}
               <Route

@@ -5,6 +5,7 @@ import { getPublicProfile, getPublicResume, PublicProfile } from "../../services
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import { LoadingState } from "../../components/ui/loading";
 import PublicLayout from "../../components/public/PublicLayout";
+import SEOHead from "../../components/common/SEOHead";
 
 export default function PublicProfilePage() {
   const { username } = useParams() as { username: string };
@@ -88,11 +89,13 @@ export default function PublicProfilePage() {
   }
 
   return (
-    <PublicLayout 
-      profile={profile}
-      onDownloadResume={hasResume ? handleDownloadResume : undefined}
-      hasResume={hasResume}
-    >
+    <>
+      <SEOHead profile={profile} />
+      <PublicLayout 
+        profile={profile}
+        onDownloadResume={hasResume ? handleDownloadResume : undefined}
+        hasResume={hasResume}
+      >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -165,5 +168,6 @@ export default function PublicProfilePage() {
         </div>
       </motion.div>
     </PublicLayout>
+    </>
   );
 }
