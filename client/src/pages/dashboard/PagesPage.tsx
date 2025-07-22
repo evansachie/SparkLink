@@ -28,52 +28,14 @@ import {
   deletePage, 
   reorderPages,
   CreatePagePayload,
-  UpdatePagePayload
-} from "../../services/api/pages";
+  UpdatePagePayload} from "../../services/api/pages";
 import Button from "../../components/common/Button";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import PageEditor from "../../components/pages/PageEditor";
 import SortablePageCard from "../../components/pages/SortablePageCard";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
-
-export enum PageType {
-  HOME = "HOME",
-  ABOUT = "ABOUT",
-  PROJECTS = "PROJECTS",
-  SERVICES = "SERVICES",
-  CONTACT = "CONTACT",
-  GALLERY = "GALLERY",
-  BLOG = "BLOG",
-  RESUME = "RESUME",
-  TESTIMONIALS = "TESTIMONIALS",
-  CUSTOM = "CUSTOM"
-}
-
-export interface Page {
-  id: string;
-  type: PageType;
-  title: string;
-  slug: string;
-  content: Record<string, unknown>;
-  isPublished: boolean;
-  isPasswordProtected: boolean;
-  order: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-const PAGE_TYPE_OPTIONS = [
-  { value: PageType.HOME, label: "Home", description: "Main landing page" },
-  { value: PageType.ABOUT, label: "About", description: "About me/company" },
-  { value: PageType.PROJECTS, label: "Projects", description: "Portfolio projects" },
-  { value: PageType.SERVICES, label: "Services", description: "Services offered" },
-  { value: PageType.CONTACT, label: "Contact", description: "Contact information" },
-  { value: PageType.GALLERY, label: "Gallery", description: "Image gallery" },
-  { value: PageType.BLOG, label: "Blog", description: "Blog posts" },
-  { value: PageType.RESUME, label: "Resume", description: "Professional resume" },
-  { value: PageType.TESTIMONIALS, label: "Testimonials", description: "Client feedback" },
-  { value: PageType.CUSTOM, label: "Custom", description: "Custom page" },
-];
+import { PageType, Page } from "../../types/api";
+import { PAGE_TYPE_OPTIONS } from "../../constants/pageTypes";
 
 export default function PagesPage() {
   const { user } = useAuth();
@@ -82,16 +44,13 @@ export default function PagesPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   
-  // Editor state
   const [showEditor, setShowEditor] = useState(false);
   const [editingPage, setEditingPage] = useState<Page | null>(null);
   const [editorLoading, setEditorLoading] = useState(false);
 
-  // Delete confirmation
   const [pageToDelete, setPageToDelete] = useState<Page | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  // DnD Kit sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -99,7 +58,6 @@ export default function PagesPage() {
     })
   );
 
-  // Load pages
   useEffect(() => {
     loadPages();
   }, []);
@@ -109,7 +67,11 @@ export default function PagesPage() {
       setLoading(true);
       setError(null);
       const data = await getPages();
-      setPages(data.pages);
+      const convertedPages = data.pages.map(page => ({
+        ...page,
+        type: page.type as unknown as PageType
+      }));
+      setPages(convertedPages);
     } catch (err) {
       setError(getErrorMessage(err, "Failed to load pages"));
     } finally {
@@ -133,14 +95,21 @@ export default function PagesPage() {
       setError(null);
 
       if (editingPage) {
-        // Update existing page
         const updatedPage = await updatePage(editingPage.id, pageData as UpdatePagePayload);
-        setPages(prev => prev.map(p => p.id === editingPage.id ? updatedPage.page : p));
+        const convertedPage = {
+          ...updatedPage.page,
+          type: updatedPage.page.type as unknown as PageType
+        };
+        setPages(prev => prev.map(p => p.id === editingPage.id ? convertedPage : p));
         setSuccess("Page updated successfully!");
       } else {
         // Create new page
         const newPage = await createPage(pageData as CreatePagePayload);
-        setPages(prev => [...prev, newPage.page]);
+        const convertedPage = {
+          ...newPage.page,
+          type: newPage.page.type as unknown as PageType
+        };
+        setPages(prev => [...prev, convertedPage]);
         setSuccess("Page created successfully!");
       }
 
@@ -176,7 +145,11 @@ export default function PagesPage() {
       const updatedPage = await updatePage(page.id, {
         isPublished: !page.isPublished
       });
-      setPages(prev => prev.map(p => p.id === page.id ? updatedPage.page : p));
+      const convertedPage = {
+        ...updatedPage.page,
+        type: updatedPage.page.type as unknown as PageType
+      };
+      setPages(prev => prev.map(p => p.id === page.id ? convertedPage : p));
       setSuccess(`Page ${!page.isPublished ? 'published' : 'unpublished'} successfully!`);
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {

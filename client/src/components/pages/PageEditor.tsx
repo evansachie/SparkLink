@@ -14,32 +14,7 @@ import {
 import { CreatePagePayload, UpdatePagePayload } from "../../services/api/pages";
 import Input from "../common/Input";
 import Button from "../common/Button";
-
-enum PageType {
-  HOME = "HOME",
-  ABOUT = "ABOUT",
-  PROJECTS = "PROJECTS",
-  SERVICES = "SERVICES",
-  CONTACT = "CONTACT",
-  GALLERY = "GALLERY",
-  BLOG = "BLOG",
-  RESUME = "RESUME",
-  TESTIMONIALS = "TESTIMONIALS",
-  CUSTOM = "CUSTOM"
-}
-
-interface Page {
-  id: string;
-  type: PageType;
-  title: string;
-  slug: string;
-  content: Record<string, unknown>;
-  isPublished: boolean;
-  isPasswordProtected: boolean;
-  order: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Page, PageType } from "../../types/api";
 
 interface PageEditorProps {
   page?: Page | null;

@@ -11,32 +11,8 @@ import {
 } from "react-icons/md";
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-
-enum PageType {
-  HOME = "HOME",
-  ABOUT = "ABOUT",
-  PROJECTS = "PROJECTS",
-  SERVICES = "SERVICES",
-  CONTACT = "CONTACT",
-  GALLERY = "GALLERY",
-  BLOG = "BLOG",
-  RESUME = "RESUME",
-  TESTIMONIALS = "TESTIMONIALS",
-  CUSTOM = "CUSTOM"
-}
-
-interface Page {
-  id: string;
-  type: PageType;
-  title: string;
-  slug: string;
-  content: Record<string, unknown>;
-  isPublished: boolean;
-  isPasswordProtected: boolean;
-  order: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Page } from "../../types/api";
+import { PAGE_TYPE_COLORS, PAGE_TYPE_LABELS } from "../../constants/pageTypes";
 
 interface SortablePageCardProps {
   page: Page;
@@ -46,32 +22,6 @@ interface SortablePageCardProps {
   onCopyUrl: (page: Page) => void;
   canPasswordProtected?: boolean;
 }
-
-const PAGE_TYPE_LABELS: Record<PageType, string> = {
-  [PageType.HOME]: "Home",
-  [PageType.ABOUT]: "About",
-  [PageType.PROJECTS]: "Projects",
-  [PageType.SERVICES]: "Services",
-  [PageType.CONTACT]: "Contact",
-  [PageType.GALLERY]: "Gallery",
-  [PageType.BLOG]: "Blog",
-  [PageType.RESUME]: "Resume",
-  [PageType.TESTIMONIALS]: "Testimonials",
-  [PageType.CUSTOM]: "Custom",
-};
-
-const PAGE_TYPE_COLORS: Record<PageType, string> = {
-  [PageType.HOME]: "bg-blue-100 text-blue-800",
-  [PageType.ABOUT]: "bg-purple-100 text-purple-800",
-  [PageType.PROJECTS]: "bg-green-100 text-green-800",
-  [PageType.SERVICES]: "bg-orange-100 text-orange-800",
-  [PageType.CONTACT]: "bg-pink-100 text-pink-800",
-  [PageType.GALLERY]: "bg-indigo-100 text-indigo-800",
-  [PageType.BLOG]: "bg-yellow-100 text-yellow-800",
-  [PageType.RESUME]: "bg-red-100 text-red-800",
-  [PageType.TESTIMONIALS]: "bg-teal-100 text-teal-800",
-  [PageType.CUSTOM]: "bg-gray-100 text-gray-800",
-};
 
 export default function SortablePageCard({
   page,
