@@ -32,7 +32,7 @@ export default function TermsAndPrivacy({
           id="terms-agreement"
           checked={agreed}
           onChange={(e) => onAgreedChange(e.target.checked)}
-          className="w-4 h-4 text-primary bg-background border-2 border-border rounded focus:ring-primary/20 focus:ring-2 transition-all cursor-pointer"
+          className="w-4 h-4 text-primary bg-white border-2 border-gray-300 rounded focus:ring-primary/20 focus:ring-2 transition-all cursor-pointer"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         />
