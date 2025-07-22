@@ -1,24 +1,8 @@
 import axios from "axios";
 import { API_URL } from "./auth";
-import { PageType } from "../../pages/dashboard/PagesPage";
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
-export interface PageData {
-  id: string;
-  type: PageType;
-  title: string;
-  slug: string;
-  content: Record<string, unknown>;
-  isPublished: boolean;
-  isPasswordProtected: boolean;
-  order: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Page, PagesResponse } from "../../types/api";
+import { getAuthHeaders } from "../../utils/getAuthHeaders";
+import { PageType } from "../../types/api";
 
 export interface CreatePagePayload {
   type: PageType;
@@ -41,23 +25,24 @@ export interface UpdatePagePayload {
 
 export interface ReorderPagesPayload {
   pageOrders: Array<{ id: string; order: number }>;
+
 }
 
-export const getPages = async (): Promise<{ pages: PageData[] }> => {
+export const getPages = async (): Promise<PagesResponse> => {
   const response = await axios.get(`${API_URL}/pages`, {
     headers: getAuthHeaders(),
   });
   return response.data.data;
 };
 
-export const getPageById = async (pageId: string): Promise<{ page: PageData }> => {
+export const getPageById = async (pageId: string): Promise<{ page: Page }> => {
   const response = await axios.get(`${API_URL}/pages/${pageId}`, {
     headers: getAuthHeaders(),
   });
   return response.data.data;
 };
 
-export const createPage = async (data: CreatePagePayload): Promise<{ page: PageData }> => {
+export const createPage = async (data: CreatePagePayload): Promise<{ page: Page }> => {
   const response = await axios.post(`${API_URL}/pages`, data, {
     headers: getAuthHeaders(),
   });
@@ -67,7 +52,7 @@ export const createPage = async (data: CreatePagePayload): Promise<{ page: PageD
 export const updatePage = async (
   pageId: string,
   data: UpdatePagePayload
-): Promise<{ page: PageData }> => {
+): Promise<{ page: Page }> => {
   const response = await axios.put(`${API_URL}/pages/${pageId}`, data, {
     headers: getAuthHeaders(),
   });
@@ -80,7 +65,7 @@ export const deletePage = async (pageId: string): Promise<void> => {
   });
 };
 
-export const reorderPages = async (data: ReorderPagesPayload): Promise<{ pages: PageData[] }> => {
+export const reorderPages = async (data: ReorderPagesPayload): Promise<{ pages: Page[] }> => {
   const response = await axios.post(`${API_URL}/pages/reorder`, data, {
     headers: getAuthHeaders(),
   });

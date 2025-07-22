@@ -1,73 +1,29 @@
 import axios from "axios";
 import { API_URL } from "./auth";
+import { AnalyticsSummary, AnalyticsTrendsResponse } from "../../types/api";
+import { getAuthHeaders } from "../../utils/getAuthHeaders";
 
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
-export interface AnalyticsSummary {
-  totalViews: number;
-  profileViews: number;
-  pageViews: number;
-  linkClicks: number;
-  topPages: Array<{
-    title: string;
-    slug: string;
-    views: number;
-  }>;
-  topReferrers: Array<{
-    source: string;
-    visits: number;
-  }>;
-  recentActivity: Array<{
-    event: string;
-    data: Record<string, unknown>;
-    createdAt: string;
-  }>;
+export interface GeoStat {
+  country: string;
+  countryCode: string;
+  visits: number;
+  percentage: number;
 }
 
-export interface AnalyticsTrends {
-  period: string;
-  data: Array<{
-    date: string;
-    views: number;
-    visitors: number;
-    bounceRate: number;
-  }>;
+export interface DeviceStat {
+  device: string;
+  visits: number;
+  percentage: number;
 }
 
-export interface GeographicData {
-  countries: Array<{
-    country: string;
-    countryCode: string;
-    visits: number;
-    percentage: number;
-  }>;
-  cities: Array<{
-    city: string;
-    country: string;
-    visits: number;
-    percentage: number;
-  }>;
+export interface GeoStatsResponse {
+  geoStats: GeoStat[];
+  totalVisits: number;
 }
 
-export interface DeviceData {
-  devices: Array<{
-    type: string;
-    visits: number;
-    percentage: number;
-  }>;
-  browsers: Array<{
-    browser: string;
-    visits: number;
-    percentage: number;
-  }>;
-  operatingSystems: Array<{
-    os: string;
-    visits: number;
-    percentage: number;
-  }>;
+export interface DeviceStatsResponse {
+  deviceStats: DeviceStat[];
+  totalVisits: number;
 }
 
 export const getAnalyticsSummary = async (): Promise<AnalyticsSummary> => {
@@ -78,23 +34,25 @@ export const getAnalyticsSummary = async (): Promise<AnalyticsSummary> => {
 };
 
 export const getAnalyticsTrends = async (
-  period: "7d" | "30d" | "90d" | "1y" = "30d"
-): Promise<AnalyticsTrends> => {
-  const response = await axios.get(`${API_URL}/analytics/trends`, {
-    headers: getAuthHeaders(),
-    params: { period },
-  });
+  days = "30"
+): Promise<AnalyticsTrendsResponse> => {
+  const response = await axios.get(
+    `${API_URL}/analytics/trends?days=${days}`,
+    {
+      headers: getAuthHeaders(),
+    }
+  );
   return response.data.data;
 };
 
-export const getGeographicAnalytics = async (): Promise<GeographicData> => {
+export const getGeoStats = async (): Promise<GeoStatsResponse> => {
   const response = await axios.get(`${API_URL}/analytics/geo`, {
     headers: getAuthHeaders(),
   });
   return response.data.data;
 };
 
-export const getDeviceAnalytics = async (): Promise<DeviceData> => {
+export const getDeviceStats = async (): Promise<DeviceStatsResponse> => {
   const response = await axios.get(`${API_URL}/analytics/devices`, {
     headers: getAuthHeaders(),
   });

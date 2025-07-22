@@ -19,15 +19,28 @@ export interface SocialLink {
   url: string;
 }
 
+export enum PageType {
+  HOME = "HOME",
+  ABOUT = "ABOUT",
+  PROJECTS = "PROJECTS",
+  SERVICES = "SERVICES",
+  CONTACT = "CONTACT",
+  GALLERY = "GALLERY",
+  BLOG = "BLOG",
+  RESUME = "RESUME",
+  TESTIMONIALS = "TESTIMONIALS",
+  CUSTOM = "CUSTOM"
+}
+
 export interface Page {
   id: string;
+  type: PageType;
   title: string;
   slug: string;
-  type: string;
-  order: number;
   content: Record<string, unknown>;
   isPublished: boolean;
   isPasswordProtected?: boolean;
+  order: number;
   createdAt: string;
   updatedAt: string;
 }
