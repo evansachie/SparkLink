@@ -38,10 +38,10 @@ import {
   updateGalleryItem,
   deleteGalleryItem,
   reorderGalleryItems,
-  GalleryItem,
   CreateGalleryItemPayload,
   UpdateGalleryItemPayload,
 } from "../../services/api/gallery";
+import { GalleryItem } from "../../types/api";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import { LoadingCard } from "../../components/ui/loading";
 import { Button } from "../../components/ui/button";
@@ -513,7 +513,7 @@ export default function GalleryPage() {
     const loadGalleryItems = async () => {
       try {
         const { items: galleryItems } = await getGalleryItems();
-        setItems(galleryItems.sort((a, b) => a.order - b.order));
+        setItems(galleryItems.sort((a, b) => (a.order || 0) - (b.order || 0)));
       } catch (err) {
         error("Failed to load gallery", getErrorMessage(err));
       } finally {
@@ -600,7 +600,7 @@ export default function GalleryPage() {
         error("Failed to update order", getErrorMessage(err));
         // Revert on failure
         const { items: galleryItems } = await getGalleryItems();
-        setItems(galleryItems.sort((a, b) => a.order - b.order));
+        setItems(galleryItems.sort((a, b) => (a.order || 0) - (b.order || 0)));
       }
     }
   };

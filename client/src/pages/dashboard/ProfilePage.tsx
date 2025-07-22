@@ -26,6 +26,7 @@ import {
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import { SOCIAL_PLATFORMS } from "../../constants/profileTypes";
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -51,9 +52,9 @@ interface SocialLink {
 
 interface ProfileData {
   id: string;
-  firstName: string;
-  lastName: string;
-  username: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
   email: string;
   country?: string;
   phone?: string;
@@ -64,17 +65,6 @@ interface ProfileData {
   socialLinks: SocialLink[];
   isPublished: boolean;
 }
-
-const SOCIAL_PLATFORMS = [
-  { value: "twitter", label: "Twitter", icon: "🐦" },
-  { value: "linkedin", label: "LinkedIn", icon: "💼" },
-  { value: "github", label: "GitHub", icon: "🐙" },
-  { value: "instagram", label: "Instagram", icon: "📷" },
-  { value: "facebook", label: "Facebook", icon: "👥" },
-  { value: "youtube", label: "YouTube", icon: "📺" },
-  { value: "tiktok", label: "TikTok", icon: "🎵" },
-  { value: "website", label: "Website", icon: "🌐" },
-];
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -112,8 +102,16 @@ export default function ProfilePage() {
       try {
         setLoading(true);
         const data = await getProfile();
-        setProfile(data);
-        setSocialLinks(data.socialLinks || []);
+        const profileData: ProfileData = {
+          ...data,
+          isPublished: true,
+          socialLinks: (data.socialLinks || []).map((link, index) => ({
+            ...link,
+            order: index
+          }))
+        };
+        setProfile(profileData);
+        setSocialLinks(profileData.socialLinks);
         
         // Populate form
         reset({
@@ -191,8 +189,16 @@ export default function ProfilePage() {
       setSuccess("Profile updated successfully!");
       
       // Reload profile data
-      const updatedProfile = await getProfile();
-      setProfile(updatedProfile);
+      const updatedData = await getProfile();
+      const updatedProfileData: ProfileData = {
+        ...updatedData,
+        isPublished: true,
+        socialLinks: (updatedData.socialLinks || []).map((link, index) => ({
+          ...link,
+          order: index
+        }))
+      };
+      setProfile(updatedProfileData);
       
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {

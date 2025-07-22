@@ -16,9 +16,10 @@ import { useToast } from "../../hooks/useToast";
 import {
   getAnalyticsSummary,
   getAnalyticsTrends,
-  getGeographicAnalytics,
-  getDeviceAnalytics,
+  getGeoStats,
+  getDeviceStats,
 } from "../../services/api/analytics";
+import { ActivityEvent } from "../../types/api";
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { getErrorMessage } from "../../utils/getErrorMessage";
@@ -283,9 +284,13 @@ export default function EnhancedAnalytics({ timeRange }: EnhancedAnalyticsProps)
     };
     trendsData: Array<{
       date: string;
-      views: number;
-      visitors: number;
-      bounceRate: number;
+      views?: number;
+      visitors?: number;
+      bounceRate?: number;
+      profileViews?: number;
+      pageViews?: number;
+      galleryViews?: number;
+      socialClicks?: number;
     }>;
     trafficSources: Array<{
       source: string;
@@ -319,8 +324,8 @@ export default function EnhancedAnalytics({ timeRange }: EnhancedAnalyticsProps)
       const [summary, trends, geographic, devices] = await Promise.all([
         getAnalyticsSummary(),
         getAnalyticsTrends(timeRange),
-        getGeographicAnalytics(),
-        getDeviceAnalytics(),
+        getGeoStats(),
+        getDeviceStats(),
       ]);
 
       // Transform data for enhanced display
@@ -331,19 +336,24 @@ export default function EnhancedAnalytics({ timeRange }: EnhancedAnalyticsProps)
           bounceRate: { value: 34.2, change: -2.1 },
           avgSessionDuration: { value: 245, change: 15.7 },
         },
-        trendsData: trends?.data || [],
+        trendsData: trends?.trends.map(trend => ({
+          date: trend.date,
+          views: trend.pageViews,
+          visitors: trend.profileViews,
+          bounceRate: 0,
+        })) || [],
         trafficSources: [
           { source: "Direct", visits: 1200, color: "#3B82F6" },
           { source: "Social Media", visits: 800, color: "#10B981" },
           { source: "Search Engines", visits: 600, color: "#F59E0B" },
           { source: "Referrals", visits: 400, color: "#EF4444" },
         ],
-        realtimeActivity: summary.recentActivity.map((activity, index) => ({
+        realtimeActivity: summary.recentActivity.map((activity: ActivityEvent, index: number) => ({
           id: `activity-${index}`,
           event: activity.event,
           timestamp: new Date(activity.createdAt),
-          country: geographic.countries[0]?.country || "Unknown",
-          device: devices.devices[0]?.type || "Desktop",
+          country: geographic.geoStats[0]?.country || "Unknown",
+          device: devices.deviceStats[0]?.device || "Desktop",
         })),
       };
 

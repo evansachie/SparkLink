@@ -110,18 +110,10 @@ export default function DashboardHome() {
 
   return (
     <div className="space-y-8">
-      {/* Welcome Section */}
       <WelcomeSection profile={dashboardData.profile} />
-      
-      {/* Quick Actions */}
       <QuickActionsSection username={dashboardData.profile?.username} />
-      
-      {/* Analytics Overview */}
       <PerformanceOverview analytics={dashboardData.analytics} />
-      
-      {/* Main Content Grid */}
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* Portfolio Management */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -134,8 +126,6 @@ export default function DashboardHome() {
             profile={dashboardData.profile}
           />
         </motion.div>
-
-        {/* Activity & Analytics */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
