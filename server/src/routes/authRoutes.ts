@@ -20,9 +20,7 @@ router.get('/google',
 
 router.get('/google/callback',
   passport.authenticate('google', { 
-    failureRedirect: process.env.NODE_ENV === 'production'
-      ? 'https://sparklink-lyart.vercel.app/login?error=google_auth_failed'
-      : 'http://localhost:5173/login?error=google_auth_failed',
+    failureRedirect: 'https://sparklink-lyart.vercel.app/login?error=google_auth_failed',
     session: true
   }),
   googleCallback as any
