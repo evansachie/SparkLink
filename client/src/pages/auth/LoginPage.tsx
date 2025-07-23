@@ -33,7 +33,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid },
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
   });
@@ -114,7 +114,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isValid}
                 className="w-full h-11 text-base font-medium pulse-glow"
               >
                 {isSubmitting ? "Signing in..." : "Sign In"}

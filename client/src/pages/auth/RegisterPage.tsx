@@ -40,7 +40,7 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid },
     reset,
   } = useForm<RegisterFormInputs>({
     resolver: zodResolver(registerSchema),
@@ -165,7 +165,7 @@ export default function RegisterPage() {
 
               <Button
                 type="submit"
-                disabled={isSubmitting || !agreedToTerms}
+                disabled={isSubmitting || !agreedToTerms || !isValid}
                 className="w-full h-11 text-base font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
