@@ -11,7 +11,7 @@ interface RecentActivity {
   action: string;
   item: string;
   time: string;
-  icon: JSX.Element;
+  icon: React.ReactElement;
   type: string;
 }
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from "framer-motion";
 import { 
   MdArrowUpward, 
@@ -19,7 +20,7 @@ interface StatCardProps {
   value: string | number;
   change: string;
   trend: "up" | "down";
-  icon: JSX.Element;
+  icon: React.ReactElement;
   color: string;
   index: number;
 }

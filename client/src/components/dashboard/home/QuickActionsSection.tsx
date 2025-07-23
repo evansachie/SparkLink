@@ -9,7 +9,7 @@ import {
 import { useAuth } from "../../../context/AuthContext";
 
 interface ActionItem {
-  icon: JSX.Element;
+  icon: React.ReactElement;
   title: string;
   desc: string;
   to: string;

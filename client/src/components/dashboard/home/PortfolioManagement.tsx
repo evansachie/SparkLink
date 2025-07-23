@@ -9,7 +9,7 @@ import {
 import { Profile, Page, GalleryItem } from "../../../types/api";
 
 interface FeatureCardProps {
-  icon: JSX.Element;
+  icon: React.ReactElement;
   title: string;
   description: string;
   to: string;
