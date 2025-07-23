@@ -19,21 +19,12 @@ export class OAuthService {
     return OAuthService.instance;
   }
 
-  /**
-   * Get the appropriate backend URL based on environment
-   */
-  private getBackendUrl(): string {
-    return import.meta.env.PROD 
-      ? "https://sparklink.onrender.com"
-      : "http://localhost:3001";
-  }
 
   /**
    * Initiate Google OAuth flow
    */
   initiateGoogleAuth(): void {
-    const backendUrl = this.getBackendUrl();
-    window.location.href = `${backendUrl}/api/auth/google`;
+    window.location.href = "https://sparklink.onrender.com/api/auth/google";
   }
 
   /**
