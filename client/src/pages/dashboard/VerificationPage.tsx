@@ -41,9 +41,14 @@ export default function VerificationPage() {
 
   // Check if user is on BLAZE tier (required for verification)
   const userTier = user && typeof user === "object" && "subscription" in user 
-    ? user.subscription as string 
+    ? (user.subscription as string || "").toUpperCase()
     : "STARTER";
-  const canRequestVerification = userTier === "BLAZE";
+  
+  // Debug user subscription
+  console.log("User subscription tier:", userTier);
+  
+  // Allow verification for any case of BLAZE (case insensitive)
+  const canRequestVerification = userTier === "BLAZE" || userTier.includes("BLAZE");
 
   // Load verification data
   const loadVerificationData = useCallback(async () => {

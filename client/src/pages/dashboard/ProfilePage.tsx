@@ -3,16 +3,12 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  MdPerson,
-  MdSave,
-  MdClose,
-  MdCloudUpload,
-  MdDelete,
-  MdAdd,
-  MdLink,
-  MdCheck,
-  MdError,
+import { 
+  MdSave, 
+  MdClose, 
+  MdCheck, 
+  MdError, 
+  MdPerson
 } from "react-icons/md";
 import { useAuth } from "../../context/AuthContext";
 import { 
@@ -23,9 +19,12 @@ import {
   updateSocialLinks,
   checkUsernameAvailability
 } from "../../services/api/profile";
-import Input from "../../components/common/Input";
+import BasicInfoSection from "../../components/profile/BasicInfoSection";
+import ProfileImagesSection from "../../components/profile/ProfileImagesSection";
+import SocialLinksSection from "../../components/profile/SocialLinksSection";
 import Button from "../../components/common/Button";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import { SOCIAL_PLATFORMS } from "../../constants/profileTypes";
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -51,9 +50,9 @@ interface SocialLink {
 
 interface ProfileData {
   id: string;
-  firstName: string;
-  lastName: string;
-  username: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
   email: string;
   country?: string;
   phone?: string;
@@ -64,17 +63,6 @@ interface ProfileData {
   socialLinks: SocialLink[];
   isPublished: boolean;
 }
-
-const SOCIAL_PLATFORMS = [
-  { value: "twitter", label: "Twitter", icon: "🐦" },
-  { value: "linkedin", label: "LinkedIn", icon: "💼" },
-  { value: "github", label: "GitHub", icon: "🐙" },
-  { value: "instagram", label: "Instagram", icon: "📷" },
-  { value: "facebook", label: "Facebook", icon: "👥" },
-  { value: "youtube", label: "YouTube", icon: "📺" },
-  { value: "tiktok", label: "TikTok", icon: "🎵" },
-  { value: "website", label: "Website", icon: "🌐" },
-];
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -89,8 +77,6 @@ export default function ProfilePage() {
     message: string;
   }>({ checking: false, available: null, message: "" });
 
-  const [profileImageUploading, setProfileImageUploading] = useState(false);
-  const [backgroundImageUploading, setBackgroundImageUploading] = useState(false);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [socialLinksChanged, setSocialLinksChanged] = useState(false);
 
@@ -111,21 +97,52 @@ export default function ProfilePage() {
     const loadProfile = async () => {
       try {
         setLoading(true);
-        const data = await getProfile();
-        setProfile(data);
-        setSocialLinks(data.socialLinks || []);
+        const apiResponse = await getProfile();
         
-        // Populate form
+        if (!apiResponse) {
+          throw new Error("No profile data returned from server");
+        }
+
+        const userData = apiResponse.user || {};
+        const profileInfo = apiResponse.profile || {};
+        
+        // Combine the data from both objects
+        const profileData: ProfileData = {
+          id: userData.id || "",
+          firstName: userData.firstName || "",
+          lastName: userData.lastName || "",
+          username: userData.username || "",
+          email: userData.email || "",
+          country: userData.country || "",
+          phone: userData.phone || "",
+          profilePicture: userData.profilePicture || "",
+          bio: profileInfo.bio || "",
+          tagline: profileInfo.tagline || "",
+          backgroundImage: profileInfo.backgroundImage || "",
+          socialLinks: (profileInfo.socialLinks || []).map((link, index: number) => ({
+            ...link,
+            order: index,
+            platform: link.platform || "",
+            url: link.url || ""
+          })),
+          isPublished: profileInfo.isPublished || false
+        };
+        
+        setProfile(profileData);
+        setSocialLinks(profileData.socialLinks || []);
+        
         reset({
-          firstName: data.firstName || "",
-          lastName: data.lastName || "",
-          username: data.username || "",
-          country: data.country || "",
-          phone: data.phone || "",
-          bio: data.bio || "",
-          tagline: data.tagline || "",
+          firstName: userData.firstName || "",
+          lastName: userData.lastName || "",
+          username: userData.username || "",
+          country: userData.country || "",
+          phone: userData.phone || "",
+          bio: profileInfo.bio || "",
+          tagline: profileInfo.tagline || "",
         });
+        
       } catch (err) {
+        console.error("Profile load error:", err);
         setError(getErrorMessage(err, "Failed to load profile"));
       } finally {
         setLoading(false);
@@ -191,8 +208,34 @@ export default function ProfilePage() {
       setSuccess("Profile updated successfully!");
       
       // Reload profile data
-      const updatedProfile = await getProfile();
-      setProfile(updatedProfile);
+      const updatedApiResponse = await getProfile();
+      
+      // Extract the user and profile data
+      const updatedUserData = updatedApiResponse.user || {};
+      const updatedProfileInfo = updatedApiResponse.profile || {};
+      
+      // Combine into our ProfileData structure
+      const updatedProfileData: ProfileData = {
+        id: updatedUserData.id || "",
+        firstName: updatedUserData.firstName || "",
+        lastName: updatedUserData.lastName || "",
+        username: updatedUserData.username || "",
+        email: updatedUserData.email || "",
+        country: updatedUserData.country || "",
+        phone: updatedUserData.phone || "",
+        profilePicture: updatedUserData.profilePicture || "",
+        bio: updatedProfileInfo.bio || "",
+        tagline: updatedProfileInfo.tagline || "",
+        backgroundImage: updatedProfileInfo.backgroundImage || "",
+        socialLinks: (updatedProfileInfo.socialLinks || []).map((link, index: number) => ({
+          ...link,
+          order: index,
+          platform: link.platform || "",
+          url: link.url || ""
+        })),
+        isPublished: updatedProfileInfo.isPublished || false
+      };
+      setProfile(updatedProfileData);
       
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
@@ -206,10 +249,7 @@ export default function ProfilePage() {
     file: File, 
     type: "profile" | "background"
   ) => {
-    const setUploading = type === "profile" ? setProfileImageUploading : setBackgroundImageUploading;
-    
     try {
-      setUploading(true);
       setError(null);
 
       const uploadFn = type === "profile" ? uploadProfilePicture : uploadBackgroundImage;
@@ -225,32 +265,7 @@ export default function ProfilePage() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       setError(getErrorMessage(err, `Failed to upload ${type} image`));
-    } finally {
-      setUploading(false);
     }
-  };
-
-  const addSocialLink = () => {
-    const newLink: SocialLink = {
-      platform: "website",
-      url: "",
-      order: socialLinks.length
-    };
-    setSocialLinks([...socialLinks, newLink]);
-    setSocialLinksChanged(true);
-  };
-
-  const updateSocialLink = (index: number, field: keyof SocialLink, value: string | number) => {
-    const updated = [...socialLinks];
-    updated[index] = { ...updated[index], [field]: value };
-    setSocialLinks(updated);
-    setSocialLinksChanged(true);
-  };
-
-  const removeSocialLink = (index: number) => {
-    const updated = socialLinks.filter((_, i) => i !== index);
-    setSocialLinks(updated);
-    setSocialLinksChanged(true);
   };
 
   if (loading) {
@@ -305,278 +320,32 @@ export default function ProfilePage() {
       </AnimatePresence>
 
       {/* Profile Images */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-      >
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Profile Images</h2>
-        
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Profile Picture */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Profile Picture
-            </label>
-            <div className="flex flex-col items-center gap-4">
-              <div className="relative">
-                {profile?.profilePicture ? (
-                  <img
-                    src={profile.profilePicture}
-                    alt="Profile"
-                    className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
-                  />
-                ) : (
-                  <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center border-4 border-gray-200">
-                    <MdPerson size={48} className="text-gray-400" />
-                  </div>
-                )}
-                {profileImageUploading && (
-                  <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
-                    <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
-                  </div>
-                )}
-              </div>
-              
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleImageUpload(file, "profile");
-                }}
-                className="hidden"
-                id="profile-upload"
-                disabled={profileImageUploading}
-              />
-              <label
-                htmlFor="profile-upload"
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition cursor-pointer disabled:opacity-50"
-              >
-                <MdCloudUpload size={20} />
-                {profileImageUploading ? "Uploading..." : "Upload Photo"}
-              </label>
-            </div>
-          </div>
-
-          {/* Background Image */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Background Image
-            </label>
-            <div className="space-y-4">
-              <div className="relative h-32 rounded-lg overflow-hidden border-2 border-dashed border-gray-300 hover:border-gray-400 transition">
-                {profile?.backgroundImage ? (
-                  <img
-                    src={profile.backgroundImage}
-                    alt="Background"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                    <div className="text-center">
-                      <MdCloudUpload size={32} className="text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">No background image</p>
-                    </div>
-                  </div>
-                )}
-                {backgroundImageUploading && (
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                    <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
-                  </div>
-                )}
-              </div>
-              
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleImageUpload(file, "background");
-                }}
-                className="hidden"
-                id="background-upload"
-                disabled={backgroundImageUploading}
-              />
-              <label
-                htmlFor="background-upload"
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition cursor-pointer disabled:opacity-50 w-full justify-center"
-              >
-                <MdCloudUpload size={20} />
-                {backgroundImageUploading ? "Uploading..." : "Upload Background"}
-              </label>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+      <ProfileImagesSection
+        profilePicture={profile?.profilePicture}
+        backgroundImage={profile?.backgroundImage}
+        onProfileImageUpload={(file) => handleImageUpload(file, "profile")}
+        onBackgroundImageUpload={(file) => handleImageUpload(file, "background")}
+      />
 
       {/* Basic Information */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-      >
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Basic Information</h2>
-        
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            <Input
-              label="First Name"
-              error={errors.firstName?.message}
-              {...register("firstName")}
-            />
-            <Input
-              label="Last Name"
-              error={errors.lastName?.message}
-              {...register("lastName")}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Input
-              label="Username"
-              error={errors.username?.message}
-              {...register("username")}
-            />
-            {watchedUsername && watchedUsername !== profile?.username && (
-              <div className="flex items-center gap-2 text-sm">
-                {usernameStatus.checking ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                    <span className="text-gray-600">Checking availability...</span>
-                  </>
-                ) : usernameStatus.available === true ? (
-                  <>
-                    <MdCheck className="text-green-600" size={16} />
-                    <span className="text-green-600">{usernameStatus.message}</span>
-                  </>
-                ) : usernameStatus.available === false ? (
-                  <>
-                    <MdClose className="text-red-600" size={16} />
-                    <span className="text-red-600">{usernameStatus.message}</span>
-                  </>
-                ) : null}
-              </div>
-            )}
-          </div>
-
-          <Input
-            label="Email"
-            type="email"
-            value={user?.email || ""}
-            disabled
-            className="bg-gray-50"
-          />
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <Input
-              label="Phone (Optional)"
-              type="tel"
-              error={errors.phone?.message}
-              {...register("phone")}
-            />
-            <Input
-              label="Country (Optional)"
-              error={errors.country?.message}
-              {...register("country")}
-            />
-          </div>
-
-          <Input
-            label="Tagline (Optional)"
-            placeholder="A brief description of what you do"
-            error={errors.tagline?.message}
-            {...register("tagline")}
-          />
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Bio (Optional)
-            </label>
-            <textarea
-              {...register("bio")}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 resize-none bg-white"
-              placeholder="Tell people about yourself, your work, and your interests..."
-            />
-            {errors.bio && (
-              <p className="text-red-600 text-sm mt-1">{errors.bio.message}</p>
-            )}
-          </div>
-        </form>
-      </motion.div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <BasicInfoSection 
+          register={register}
+          errors={errors}
+          usernameStatus={usernameStatus}
+          user={user}
+        />
+      </form>
 
       {/* Social Links */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">Social Links</h2>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={addSocialLink}
-            className="flex items-center gap-2 px-4 py-2"
-          >
-            <MdAdd size={20} />
-            Add Link
-          </Button>
-        </div>
-
-        <div className="space-y-4">
-          {socialLinks.map((link, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg"
-            >
-              <select
-                value={link.platform}
-                onChange={(e) => updateSocialLink(index, "platform", e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                {SOCIAL_PLATFORMS.map((platform) => (
-                  <option key={platform.value} value={platform.value}>
-                    {platform.icon} {platform.label}
-                  </option>
-                ))}
-              </select>
-              
-              <div className="flex-1">
-                <input
-                  type="url"
-                  value={link.url}
-                  onChange={(e) => updateSocialLink(index, "url", e.target.value)}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
-
-              <button
-                type="button"
-                onClick={() => removeSocialLink(index)}
-                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-              >
-                <MdDelete size={20} />
-              </button>
-            </motion.div>
-          ))}
-
-          {socialLinks.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <MdLink size={48} className="mx-auto mb-4 text-gray-300" />
-              <p>No social links added yet</p>
-              <p className="text-sm">Add links to your social media profiles and websites</p>
-            </div>
-          )}
-        </div>
-      </motion.div>
+      <SocialLinksSection 
+        socialLinks={socialLinks}
+        platforms={SOCIAL_PLATFORMS}
+        onChange={(links) => {
+          setSocialLinks(links);
+          setSocialLinksChanged(true);
+        }}
+      />
 
       {/* Save Button */}
       <motion.div

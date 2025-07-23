@@ -59,7 +59,7 @@ export default function Header() {
       <div className="flex items-center justify-between">
         {/* Left Section */}
         <motion.div 
-          className="flex items-center gap-6"
+          className="flex items-center gap-6 lg:ml-0 ml-8"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}

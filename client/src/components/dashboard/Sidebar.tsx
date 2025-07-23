@@ -24,70 +24,60 @@ const sidebarLinks = [
     label: "Overview",
     icon: <MdDashboard size={22} />,
     description: "Dashboard home",
-    gradient: "from-blue-500 to-blue-600",
   },
   {
     to: "/dashboard/profile",
     label: "Profile",
     icon: <MdPerson size={22} />,
     description: "Personal information",
-    gradient: "from-purple-500 to-purple-600",
   },
   {
     to: "/dashboard/pages",
     label: "Pages",
     icon: <MdPages size={22} />,
     description: "Create & manage pages",
-    gradient: "from-green-500 to-green-600",
   },
   {
     to: "/dashboard/gallery",
     label: "Gallery",
     icon: <MdPhotoLibrary size={22} />,
     description: "Photos & media",
-    gradient: "from-pink-500 to-pink-600",
   },
   {
     to: "/dashboard/analytics",
     label: "Analytics",
     icon: <MdBarChart size={22} />,
     description: "Performance insights",
-    gradient: "from-orange-500 to-orange-600",
   },
   {
     to: "/dashboard/subscription",
     label: "Subscription",
     icon: <MdCreditCard size={22} />,
     description: "Plans & billing",
-    gradient: "from-indigo-500 to-indigo-600",
   },
   {
     to: "/dashboard/settings",
     label: "Settings",
     icon: <MdSettings size={22} />,
     description: "Account preferences",
-    gradient: "from-gray-500 to-gray-600",
   },
   {
     to: "/dashboard/templates",
     label: "Templates",
     icon: <MdPages size={22} />,
     description: "Design templates",
-    gradient: "from-teal-500 to-teal-600",
   },
   {
     to: "/dashboard/resume",
     label: "Resume",
     icon: <MdPerson size={22} />,
     description: "Create & manage resume",
-    gradient: "from-yellow-500 to-yellow-600",
   },
   {
     to: "/dashboard/verification",
     label: "Verification",
     icon: <MdVerified size={22} />,
     description: "Verify your identity",
-    gradient: "from-red-500 to-red-600",
   },
 ];
 
@@ -269,7 +259,7 @@ export default function Sidebar() {
       </motion.div>
 
       {/* Navigation */}
-      <nav className={`flex-1 p-4 space-y-2 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 ${collapsed ? 'px-2' : ''}`}>
+      <nav className={`flex-1 p-4 space-y-2 overflow-y-auto overflow-x-hidden sidebar-scrollbar ${collapsed ? 'px-2' : ''}`}>
         <AnimatePresence>
           {!collapsed && (
             <motion.div
@@ -305,7 +295,7 @@ export default function Sidebar() {
                 {active && (
                   <motion.div
                     layoutId="activeBackground"
-                    className={`absolute inset-0 bg-gradient-to-r ${link.gradient} opacity-5 rounded-xl`}
+                    className={`absolute inset-0 bg-gradient-to-r opacity-5 rounded-xl`}
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
@@ -400,7 +390,7 @@ export default function Sidebar() {
       <div className="lg:hidden">
         {!open && (
           <motion.button
-            className="fixed top-4 left-4 z-50 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-3 border border-gray-200"
+            className="fixed top-3 left-3 z-50 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-2 border border-gray-200"
             onClick={() => setOpen(true)}
             aria-label="Open sidebar"
             type="button"
@@ -408,7 +398,7 @@ export default function Sidebar() {
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
-            <GiHamburgerMenu className="text-gray-800" size={24} />
+            <GiHamburgerMenu className="text-gray-800" size={18} />
           </motion.button>
         )}
       </div>
@@ -431,17 +421,17 @@ export default function Sidebar() {
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               className="absolute top-0 left-0 h-full w-80 max-w-[85vw] shadow-2xl"
             >
+              <div className="h-full flex flex-col bg-white border-r border-gray-100 w-72 relative">
               <motion.button
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10 p-2 rounded-lg hover:bg-gray-100"
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10 p-2 rounded-lg hover:bg-gray-100 bg-white/80 backdrop-blur-sm shadow-sm"
                 onClick={() => setOpen(false)}
                 aria-label="Close sidebar"
                 type="button"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <MdClose size={24} />
+                <MdClose size={20} />
               </motion.button>
-              <div className="h-full flex flex-col bg-white border-r border-gray-100 w-72">
                 {/* Mobile sidebar uses full content without collapse functionality */}
                 <motion.div
                   className="p-6 border-b border-gray-100"
@@ -491,7 +481,7 @@ export default function Sidebar() {
                   </motion.div>
                 </motion.div>
 
-                <nav className="flex-1 p-4 space-y-2 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
+                <nav className="flex-1 p-4 space-y-2 overflow-y-auto overflow-x-hidden sidebar-scrollbar">
                   <motion.div
                     className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2"
                     initial={{ opacity: 0 }}
@@ -520,7 +510,7 @@ export default function Sidebar() {
                           {active && (
                             <motion.div
                               layoutId="activeBackgroundMobile"
-                              className={`absolute inset-0 bg-gradient-to-r ${link.gradient} opacity-5 rounded-xl`}
+                              className={`absolute inset-0 bg-gradient-to-r opacity-5 rounded-xl`}
                               transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                             />
                           )}

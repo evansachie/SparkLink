@@ -62,30 +62,35 @@ export default function TemplatesPage() {
         setState(prev => ({ ...prev, loading: true }));
         const response = await getTemplates();
         
+        // Ensure colorSchemes is always an array to prevent map errors
+        const colorSchemes = Array.isArray(response.colorSchemes) ? response.colorSchemes : [];
+        const templates = Array.isArray(response.templates) ? response.templates : [];
+        
         setState(prev => ({
           ...prev,
-          templates: response.templates || [],
-          colorSchemes: response.colorSchemes || [],
+          templates: templates,
+          colorSchemes: colorSchemes,
           loading: false,
         }));
         
         // Set current template if user has one
         const userProfile = user?.profile as { templateId?: string; colorScheme?: string } | undefined;
-        if (userProfile?.templateId) {
-          const current = response.templates.find((t: Template) => t.id === userProfile.templateId);
+        if (userProfile?.templateId && templates.length > 0) {
+          const current = templates.find((t: Template) => t.id === userProfile.templateId);
           if (current) {
             setState(prev => ({ ...prev, currentTemplate: current }));
           }
         }
         
         // Set current color scheme
-        if (userProfile?.colorScheme) {
-          const currentScheme = response.colorSchemes.find((cs: ColorScheme) => cs.id === userProfile.colorScheme);
+        if (userProfile?.colorScheme && colorSchemes.length > 0) {
+          const currentScheme = colorSchemes.find((cs: ColorScheme) => cs.id === userProfile.colorScheme);
           if (currentScheme) {
             setState(prev => ({ ...prev, selectedColorScheme: currentScheme }));
           }
         }
       } catch (err) {
+        console.error('Failed to load templates:', err);
         error("Failed to load templates", getErrorMessage(err));
         setState(prev => ({ ...prev, loading: false }));
       }

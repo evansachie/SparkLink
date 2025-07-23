@@ -13,6 +13,7 @@ import OAuthButton from "../../components/auth/OAuthButton";
 import { OAuthDivider } from "../../components/common/OAuthDivider";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
+import { PasswordInput } from "../../components/ui/password-input";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Card, CardContent } from "../../components/ui/card";
 import { Label } from "../../components/ui/label";
@@ -32,7 +33,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid },
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
   });
@@ -92,9 +93,8 @@ export default function LoginPage() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
-                  <Input
+                  <PasswordInput
                     id="password"
-                    type="password"
                     autoComplete="current-password"
                     disabled={isSubmitting}
                     placeholder="••••••••"
@@ -114,7 +114,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isValid}
                 className="w-full h-11 text-base font-medium pulse-glow"
               >
                 {isSubmitting ? "Signing in..." : "Sign In"}

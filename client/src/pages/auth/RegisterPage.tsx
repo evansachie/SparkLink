@@ -14,6 +14,7 @@ import { OAuthDivider } from "../../components/common/OAuthDivider";
 import TermsAndPrivacy from "../../components/auth/shared/TermsAndPrivacy";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
+import { PasswordInput } from "../../components/ui/password-input";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Card, CardContent } from "../../components/ui/card";
 import { Label } from "../../components/ui/label";
@@ -39,7 +40,7 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid },
     reset,
   } = useForm<RegisterFormInputs>({
     resolver: zodResolver(registerSchema),
@@ -116,9 +117,8 @@ export default function RegisterPage() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
-                  <Input
+                  <PasswordInput
                     id="password"
-                    type="password"
                     autoComplete="new-password"
                     disabled={isSubmitting}
                     placeholder="Create a strong password"
@@ -131,9 +131,8 @@ export default function RegisterPage() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirm password</Label>
-                  <Input
+                  <PasswordInput
                     id="confirmPassword"
-                    type="password"
                     autoComplete="new-password"
                     disabled={isSubmitting}
                     placeholder="Confirm your password"
@@ -166,7 +165,7 @@ export default function RegisterPage() {
 
               <Button
                 type="submit"
-                disabled={isSubmitting || !agreedToTerms}
+                disabled={isSubmitting || !agreedToTerms || !isValid}
                 className="w-full h-11 text-base font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (

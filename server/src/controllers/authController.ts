@@ -319,9 +319,15 @@ export const googleCallback = async (req: Request, res: Response) => {
     
     if (!user) {
       console.error('Google callback - No user found');
-      const errorUrl = process.env.NODE_ENV === 'production'
-        ? 'https://sparklink-lyart.vercel.app/login?error=google_auth_failed'
-        : 'http://localhost:5173/login?error=google_auth_failed';
+      // Determine error redirect URL based on request origin or referrer
+      let errorUrl = 'https://sparklink-lyart.vercel.app/login?error=google_auth_failed';
+      const origin = req.headers.origin || '';
+      const referer = req.headers.referer || '';
+      
+      if (origin.includes('localhost') || referer.includes('localhost')) {
+        errorUrl = 'http://localhost:5173/login?error=google_auth_failed';
+      }
+      
       return res.redirect(errorUrl);
     }
 
@@ -334,21 +340,32 @@ export const googleCallback = async (req: Request, res: Response) => {
     // Check if user needs to complete profile
     const needsProfile = !user.firstName || !user.lastName || !user.username;
 
-    // Determine redirect URL based on environment
-    const clientUrl = process.env.NODE_ENV === 'production'
-      ? 'https://sparklink-lyart.vercel.app'
-      : 'http://localhost:5173';
+    // Determine client URL based on request origin or referrer
+    let clientUrl = 'https://sparklink-lyart.vercel.app';
+    const origin = req.headers.origin || '';
+    const referer = req.headers.referer || '';
+    
+    // If request came from localhost, use localhost for redirect
+    if (origin.includes('localhost') || referer.includes('localhost')) {
+      clientUrl = 'http://localhost:5173';
+    }
 
-    // Always redirect to OAuth callback handler first
+    // Always redirect to OAuth callback handler with the token
     const redirectUrl = `${clientUrl}/oauth/callback?token=${token}&google=true${needsProfile ? '&new_user=true' : ''}`;
 
     console.log('Google callback - Redirecting to:', redirectUrl);
     res.redirect(redirectUrl);
   } catch (error) {
     console.error('Google callback error:', error);
-    const errorUrl = process.env.NODE_ENV === 'production'
-      ? 'https://sparklink-lyart.vercel.app/login?error=google_auth_error'
-      : 'http://localhost:5173/login?error=google_auth_error';
+    // Determine error redirect URL based on request origin or referrer
+    let errorUrl = 'https://sparklink-lyart.vercel.app/login?error=google_auth_error';
+    const origin = req.headers.origin || '';
+    const referer = req.headers.referer || '';
+    
+    if (origin.includes('localhost') || referer.includes('localhost')) {
+      errorUrl = 'http://localhost:5173/login?error=google_auth_error';
+    }
+    
     res.redirect(errorUrl);
   }
 };

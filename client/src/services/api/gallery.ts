@@ -1,24 +1,7 @@
 import axios from "axios";
 import { API_URL } from "./auth";
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
-export interface GalleryItem {
-  id: string;
-  title: string;
-  description?: string;
-  imageUrl: string;
-  publicId: string;
-  category?: string;
-  tags: string[];
-  order: number;
-  isVisible: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { GalleryItem, GalleryResponse } from "../../types/api";
+import { getAuthHeaders } from "../../utils/getAuthHeaders";
 
 export interface CreateGalleryItemPayload {
   title: string;
@@ -46,9 +29,21 @@ export interface GalleryUploadResponse {
   message: string;
 }
 
-export const getGalleryItems = async (): Promise<{ items: GalleryItem[] }> => {
-  const response = await axios.get(`${API_URL}/gallery`, {
-    headers: getAuthHeaders(),
+export const getGalleryItems = async (params?: {
+  category?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<GalleryResponse> => {
+  const queryParams = new URLSearchParams();
+  
+  if (params?.category) queryParams.append("category", params.category);
+  if (params?.limit) queryParams.append("limit", params.limit.toString());
+  if (params?.offset) queryParams.append("offset", params.offset.toString());
+  
+  const queryString = queryParams.toString() ? `?${queryParams.toString()}` : "";
+  
+  const response = await axios.get(`${API_URL}/gallery${queryString}`, {
+    headers: getAuthHeaders()
   });
   return response.data.data;
 };
