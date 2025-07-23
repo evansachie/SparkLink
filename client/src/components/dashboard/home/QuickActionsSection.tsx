@@ -26,7 +26,6 @@ export default function QuickActionsSection({ username }: QuickActionsSectionPro
   // Use provided username or fall back to user context
   const userUsername = username || (user && "username" in user ? String(user.username) : "user");
   
-  // Define quick actions
   const quickActions: ActionItem[] = [
     {
       icon: <MdAdd size={24} className="text-white" />,

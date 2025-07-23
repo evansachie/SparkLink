@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { MdWarning, MdError, MdInfo } from "react-icons/md";
 import Button from "./Button";
+import { getConfirmButtonVariant } from "../../utils/getConfirmButtonVariant";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export default function ConfirmDialog({
   loading = false,
   type = "warning"
 }: ConfirmDialogProps) {
+  
   const getIcon = () => {
     switch (type) {
       case "danger":
@@ -33,17 +35,6 @@ export default function ConfirmDialog({
         return <MdInfo className="text-blue-500" size={24} />;
       default:
         return <MdWarning className="text-orange-500" size={24} />;
-    }
-  };
-
-  const getConfirmButtonVariant = () => {
-    switch (type) {
-      case "danger":
-        return "bg-red-600 hover:bg-red-700 text-white";
-      case "info":
-        return "bg-blue-600 hover:bg-blue-700 text-white";
-      default:
-        return "bg-orange-600 hover:bg-orange-700 text-white";
     }
   };
 
