@@ -83,7 +83,8 @@ export default function DashboardHome() {
         
         // Process results handling potential rejections
         setDashboardData({
-          profile: profileResult.status === 'fulfilled' ? profileResult.value : null,
+          profile: profileResult.status === 'fulfilled' ? 
+            ('user' in profileResult.value ? profileResult.value.user : profileResult.value as Profile) : null,
           analytics: {
             summary: analyticsResult.status === 'fulfilled' ? analyticsResult.value : null,
             trends: trendsResult.status === 'fulfilled' ? trendsResult.value : null

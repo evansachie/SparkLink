@@ -32,7 +32,7 @@ export default function TermsAndPrivacy({
           id="terms-agreement"
           checked={agreed}
           onChange={(e) => onAgreedChange(e.target.checked)}
-          className="w-4 h-4 text-primary bg-white border-2 border-gray-300 rounded focus:ring-primary/20 focus:ring-2 transition-all cursor-pointer"
+          className="w-4 h-4 appearance-none border-2 border-gray-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 checked:bg-primary/90 checked:border-primary/90 transition-all duration-200 cursor-pointer"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         />
@@ -46,7 +46,7 @@ export default function TermsAndPrivacy({
             className="absolute inset-0 flex items-center justify-center pointer-events-none"
           >
             <svg
-              className="w-3 h-3 text-white"
+              className="w-3 h-3 text-primary"
               fill="currentColor"
               viewBox="0 0 20 20"
             >

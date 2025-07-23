@@ -97,29 +97,52 @@ export default function ProfilePage() {
     const loadProfile = async () => {
       try {
         setLoading(true);
-        const data = await getProfile();
-        const profileData: ProfileData = {
-          ...data,
-          isPublished: true,
-          socialLinks: (data.socialLinks || []).map((link, index) => ({
-            ...link,
-            order: index
-          }))
-        };
-        setProfile(profileData);
-        setSocialLinks(profileData.socialLinks);
+        const apiResponse = await getProfile();
         
-        // Populate form
+        if (!apiResponse) {
+          throw new Error("No profile data returned from server");
+        }
+
+        const userData = apiResponse.user || {};
+        const profileInfo = apiResponse.profile || {};
+        
+        // Combine the data from both objects
+        const profileData: ProfileData = {
+          id: userData.id || "",
+          firstName: userData.firstName || "",
+          lastName: userData.lastName || "",
+          username: userData.username || "",
+          email: userData.email || "",
+          country: userData.country || "",
+          phone: userData.phone || "",
+          profilePicture: userData.profilePicture || "",
+          bio: profileInfo.bio || "",
+          tagline: profileInfo.tagline || "",
+          backgroundImage: profileInfo.backgroundImage || "",
+          socialLinks: (profileInfo.socialLinks || []).map((link, index: number) => ({
+            ...link,
+            order: index,
+            platform: link.platform || "",
+            url: link.url || ""
+          })),
+          isPublished: profileInfo.isPublished || false
+        };
+        
+        setProfile(profileData);
+        setSocialLinks(profileData.socialLinks || []);
+        
         reset({
-          firstName: data.firstName || "",
-          lastName: data.lastName || "",
-          username: data.username || "",
-          country: data.country || "",
-          phone: data.phone || "",
-          bio: data.bio || "",
-          tagline: data.tagline || "",
+          firstName: userData.firstName || "",
+          lastName: userData.lastName || "",
+          username: userData.username || "",
+          country: userData.country || "",
+          phone: userData.phone || "",
+          bio: profileInfo.bio || "",
+          tagline: profileInfo.tagline || "",
         });
+        
       } catch (err) {
+        console.error("Profile load error:", err);
         setError(getErrorMessage(err, "Failed to load profile"));
       } finally {
         setLoading(false);
@@ -185,14 +208,32 @@ export default function ProfilePage() {
       setSuccess("Profile updated successfully!");
       
       // Reload profile data
-      const updatedData = await getProfile();
+      const updatedApiResponse = await getProfile();
+      
+      // Extract the user and profile data
+      const updatedUserData = updatedApiResponse.user || {};
+      const updatedProfileInfo = updatedApiResponse.profile || {};
+      
+      // Combine into our ProfileData structure
       const updatedProfileData: ProfileData = {
-        ...updatedData,
-        isPublished: true,
-        socialLinks: (updatedData.socialLinks || []).map((link, index) => ({
+        id: updatedUserData.id || "",
+        firstName: updatedUserData.firstName || "",
+        lastName: updatedUserData.lastName || "",
+        username: updatedUserData.username || "",
+        email: updatedUserData.email || "",
+        country: updatedUserData.country || "",
+        phone: updatedUserData.phone || "",
+        profilePicture: updatedUserData.profilePicture || "",
+        bio: updatedProfileInfo.bio || "",
+        tagline: updatedProfileInfo.tagline || "",
+        backgroundImage: updatedProfileInfo.backgroundImage || "",
+        socialLinks: (updatedProfileInfo.socialLinks || []).map((link, index: number) => ({
           ...link,
-          order: index
-        }))
+          order: index,
+          platform: link.platform || "",
+          url: link.url || ""
+        })),
+        isPublished: updatedProfileInfo.isPublished || false
       };
       setProfile(updatedProfileData);
       

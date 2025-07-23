@@ -35,14 +35,27 @@ export interface ImageUploadResponse {
   message: string;
 }
 
-export const getProfile = async (): Promise<Profile> => {
+export interface ProfileResponse {
+  user: Profile;
+  profile: {
+    id: string;
+    bio?: string;
+    tagline?: string;
+    backgroundImage?: string;
+    isPublished: boolean;
+    socialLinks?: SocialLink[];
+    [key: string]: unknown;
+  };
+}
+
+export const getProfile = async (): Promise<ProfileResponse> => {
   const response = await axios.get(`${API_URL}/profile`, {
     headers: getAuthHeaders(),
   });
   return response.data.data;
 };
 
-export const updateProfile = async (data: UpdateProfilePayload): Promise<Profile> => {
+export const updateProfile = async (data: UpdateProfilePayload): Promise<ProfileResponse> => {
   const response = await axios.put(`${API_URL}/profile`, data, {
     headers: getAuthHeaders(),
   });

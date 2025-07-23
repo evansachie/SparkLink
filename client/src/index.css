@@ -65,6 +65,12 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Fix for dark inputs */
+  input, textarea, select {
+    background-color: white !important;
+    color: #333 !important;
+  }
 }
 
 /* Custom animations */
@@ -119,4 +125,26 @@
 
 .scrollbar-thumb-gray-400::-webkit-scrollbar-thumb:hover {
   background-color: rgb(156, 163, 175);
+}
+
+/* Custom sidebar scrollbar styles */
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 4px;
+}
+
+.sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(10, 150, 143, 0.2);
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(10, 150, 143, 0.4);
 }

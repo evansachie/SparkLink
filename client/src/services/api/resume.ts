@@ -39,7 +39,7 @@ export interface ResumeAnalytics {
 
 export const getResume = async (): Promise<Resume | null> => {
   try {
-    const response = await axios.get(`${API_URL}/resume`, {
+    const response = await axios.get(`${API_URL}/resume/info`, {
       headers: getAuthHeaders(),
     });
     return response.data.data.resume;

@@ -5,10 +5,10 @@ import {
   MdAdd,
   MdEdit,
   MdDelete,
+  MdClose,
   MdDragIndicator,
   MdVisibility,
   MdVisibilityOff,
-  MdClose,
   MdCloudUpload,
 } from "react-icons/md";
 import {
@@ -223,7 +223,7 @@ function GalleryUploadModal({ isOpen, onClose, onUpload, uploading }: GalleryUpl
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[100]">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 bg-black/50 flex items-center justify-center p-4 z-[100]">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -394,7 +394,7 @@ function GalleryEditModal({ isOpen, onClose, onUpdate, item, updating = false }:
   if (!isOpen || !item) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[100]">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 bg-black/50 flex items-center justify-center p-4 z-[100]">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -571,8 +571,22 @@ export default function GalleryPage() {
 
   const handleToggleVisibility = async (id: string, isVisible: boolean) => {
     try {
-      await handleUpdate(id, { isVisible });
+      // First update local state optimistically
+      setItems(prev => prev.map(item => {
+        if (item.id === id) {
+          return { ...item, isVisible };
+        }
+        return item;
+      }));
+
+      await updateGalleryItem(id, { isVisible });
     } catch (err) {
+      setItems(prev => prev.map(item => {
+        if (item.id === id) {
+          return { ...item, isVisible: !isVisible };
+        }
+        return item;
+      }));
       error("Failed to update visibility", getErrorMessage(err));
     }
   };

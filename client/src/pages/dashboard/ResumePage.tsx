@@ -42,24 +42,37 @@ export default function ResumePage() {
   const loadResumeData = useCallback(async () => {
     try {
       setLoading(true);
-      const [resumeData, analyticsData] = await Promise.allSettled([
-        getResume(),
-        resume ? getResumeAnalytics() : Promise.resolve(null)
-      ]);
-
-      if (resumeData.status === 'fulfilled') {
-        setResume(resumeData.value);
-      }
-
-      if (analyticsData.status === 'fulfilled') {
-        setAnalytics(analyticsData.value);
+      
+      // Handle resume data loading with better error handling
+      try {
+        const resumeData = await getResume();
+        setResume(resumeData);
+        
+        // Only fetch analytics if we have a resume
+        if (resumeData) {
+          try {
+            const analyticsData = await getResumeAnalytics();
+            setAnalytics(analyticsData);
+          } catch (analyticsErr) {
+            console.error("Failed to load resume analytics:", analyticsErr);
+            setAnalytics(null);
+          }
+        }
+      } catch (resumeErr) {
+        console.error("Failed to load resume:", resumeErr);
+        // Don't show an error for 404, just set resume to null
+        setResume(null);
       }
     } catch (err) {
-      error("Failed to load resume data", getErrorMessage(err));
+      // Only show errors that aren't 404s
+      const errMessage = getErrorMessage(err);
+      if (!errMessage.includes("404")) {
+        error("Failed to load resume data", errMessage);
+      }
     } finally {
       setLoading(false);
     }
-  }, [resume, error]);
+  }, [error]);
 
   useEffect(() => {
     loadResumeData();

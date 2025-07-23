@@ -331,12 +331,12 @@ export default function EnhancedAnalytics({ timeRange }: EnhancedAnalyticsProps)
       // Transform data for enhanced display
       const enhancedData = {
         metrics: {
-          totalViews: { value: summary.totalViews, change: 12.5 },
-          uniqueVisitors: { value: summary.profileViews, change: 8.3 },
+          totalViews: { value: summary?.totalViews || 0, change: 12.5 },
+          uniqueVisitors: { value: summary?.profileViews || 0, change: 8.3 },
           bounceRate: { value: 34.2, change: -2.1 },
           avgSessionDuration: { value: 245, change: 15.7 },
         },
-        trendsData: trends?.trends.map(trend => ({
+        trendsData: trends?.trends?.map(trend => ({
           date: trend.date,
           views: trend.pageViews,
           visitors: trend.profileViews,
@@ -348,13 +348,13 @@ export default function EnhancedAnalytics({ timeRange }: EnhancedAnalyticsProps)
           { source: "Search Engines", visits: 600, color: "#F59E0B" },
           { source: "Referrals", visits: 400, color: "#EF4444" },
         ],
-        realtimeActivity: summary.recentActivity.map((activity: ActivityEvent, index: number) => ({
+        realtimeActivity: summary?.recentActivity?.map((activity: ActivityEvent, index: number) => ({
           id: `activity-${index}`,
           event: activity.event,
           timestamp: new Date(activity.createdAt),
-          country: geographic.geoStats[0]?.country || "Unknown",
-          device: devices.deviceStats[0]?.device || "Desktop",
-        })),
+          country: geographic?.geoStats?.[0]?.country || "Unknown",
+          device: devices?.deviceStats?.[0]?.device || "Desktop",
+        })) || [],
       };
 
       setData(enhancedData);
