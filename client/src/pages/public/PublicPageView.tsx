@@ -68,11 +68,12 @@ export default function PublicPageView() {
           const pageData = await getPublicPage(username, slug);
           setPage(pageData);
         } catch (err) {
+          console.error("Error loading public page:", err);
           const errorMessage = getErrorMessage(err);
           if (errorMessage.includes("password")) {
             setShowPasswordForm(true);
           } else {
-            setError("Page not found or not accessible");
+            setError(`Page not found or not accessible: ${errorMessage}`);
           }
         }
       } catch (err) {

@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  MdPages,
-  MdAdd,
-  MdClose,
-} from "react-icons/md";
-import {
   DndContext,
   closestCenter,
   KeyboardSensor,
@@ -29,16 +24,21 @@ import {
   reorderPages,
   CreatePagePayload,
   UpdatePagePayload} from "../../services/api/pages";
-import Button from "../../components/common/Button";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import { useToast } from "../../hooks/useToast";
 import PageEditor from "../../components/pages/PageEditor";
 import SortablePageCard from "../../components/pages/SortablePageCard";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
+import { CustomScrollbar } from "../../components/ui/custom-scrollbar";
+import { Alert } from "../../components/ui/alert-message";
+import { PageHeader } from "../../components/pages/PageHeader";
+import { EmptyPagesState } from "../../components/pages/EmptyPagesState";
 import { PageType, Page } from "../../types/api";
 import { PAGE_TYPE_OPTIONS } from "../../constants/pageTypes";
 
 export default function PagesPage() {
   const { user } = useAuth();
+  const toast = useToast();
   const [pages, setPages] = useState<Page[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -197,8 +197,8 @@ export default function PagesPage() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    setSuccess("URL copied to clipboard!");
-    setTimeout(() => setSuccess(null), 2000);
+    // Using toast instead of success state
+    toast.success("URL copied to clipboard!");
   };
 
   const getSubscriptionLimits = () => {
@@ -232,69 +232,37 @@ export default function PagesPage() {
     );
   }
 
+  // We can use toast instead of the error/success states in future
+
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-100 rounded-xl">
-              <MdPages size={32} className="text-purple-600" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Page Management</h1>
-              <p className="text-gray-600">
-                Create and manage your portfolio pages ({pages.length}/{limits.maxPages === Infinity ? '∞' : limits.maxPages} used)
-              </p>
-            </div>
-          </div>
-          
-          <Button
-            onClick={handleCreatePage}
-            disabled={!canCreatePage}
-            className="flex items-center gap-2"
-          >
-            <MdAdd size={20} />
-            Create Page
-          </Button>
-        </div>
-
-        {!canCreatePage && (
-          <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-            <p className="text-orange-700 text-sm">
-              You've reached the page limit for your {userSubscription} plan. 
-              <a href="/dashboard/settings" className="font-medium underline ml-1">
-                Upgrade to create more pages
-              </a>
-            </p>
-          </div>
-        )}
-      </motion.div>
+      <PageHeader 
+        title="Page Management"
+        subtitle="Create and manage your portfolio pages"
+        count={pages.length}
+        maxCount={limits.maxPages}
+        onCreateClick={handleCreatePage}
+        canCreate={canCreatePage}
+        userSubscription={userSubscription}
+      />
 
       {/* Alerts */}
       <AnimatePresence>
-        {(error || success) && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={`p-4 rounded-xl flex items-center gap-3 ${
-              error ? "bg-red-50 text-red-700 border border-red-200" : 
-              "bg-green-50 text-green-700 border border-green-200"
-            }`}
-          >
-            <span>{error || success}</span>
-            <button
-              onClick={() => { setError(null); setSuccess(null); }}
-              className="ml-auto p-1 hover:bg-white/50 rounded"
-            >
-              <MdClose size={16} />
-            </button>
-          </motion.div>
+        {error && (
+          <Alert
+            message={error}
+            type="error"
+            onClose={() => setError(null)}
+          />
+        )}
+
+        {success && (
+          <Alert
+            message={success}
+            type="success"
+            onClose={() => setSuccess(null)}
+          />
         )}
       </AnimatePresence>
 
@@ -312,19 +280,9 @@ export default function PagesPage() {
           </p>
         </div>
 
-        <div className="p-6">
+        <CustomScrollbar className="p-6 max-h-[500px]">
           {pages.length === 0 ? (
-            <div className="text-center py-12">
-              <MdPages size={64} className="mx-auto text-gray-300 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No pages yet</h3>
-              <p className="text-gray-600 mb-6">
-                Create your first page to start building your portfolio
-              </p>
-              <Button onClick={handleCreatePage} className="flex items-center gap-2 mx-auto">
-                <MdAdd size={20} />
-                Create Your First Page
-              </Button>
-            </div>
+            <EmptyPagesState onCreateClick={handleCreatePage} />
           ) : (
             <DndContext
               sensors={sensors}
@@ -351,7 +309,7 @@ export default function PagesPage() {
               </SortableContext>
             </DndContext>
           )}
-        </div>
+        </CustomScrollbar>
       </motion.div>
 
       {/* Page Editor Modal */}
