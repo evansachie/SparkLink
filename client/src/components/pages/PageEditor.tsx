@@ -142,14 +142,15 @@ export default function PageEditor({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+      className="fixed inset-0 top-0 left-0 right-0 bottom-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 overflow-hidden"
+      style={{ position: 'fixed' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden relative"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -171,7 +172,7 @@ export default function PageEditor({
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6" style={{ maxHeight: "calc(85vh - 140px)" }}>
             {/* Basic Information */}
             <div className="grid md:grid-cols-2 gap-6">
               <div>
