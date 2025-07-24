@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,6 +15,8 @@ import { CreatePagePayload, UpdatePagePayload } from "../../services/api/pages";
 import Input from "../common/Input";
 import Button from "../common/Button";
 import { Page, PageType } from "../../types/api";
+import { CustomCheckbox } from "../ui/custom-checkbox";
+import { CustomScrollbar } from "../ui/custom-scrollbar";
 
 interface PageEditorProps {
   page?: Page | null;
@@ -59,6 +61,7 @@ export default function PageEditor({
     setValue,
     watch,
     reset,
+    control,
   } = useForm<PageFormData>({
     resolver: zodResolver(pageSchema),
     defaultValues: {
@@ -142,15 +145,17 @@ export default function PageEditor({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-8 overflow-auto bg-black/50 backdrop-blur-sm"
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden relative my-8"
       >
+        <CustomScrollbar className="max-h-[calc(90vh-20px)] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
@@ -251,49 +256,63 @@ export default function PageEditor({
               
               <div className="space-y-3">
                 {/* Publish Setting */}
-                <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    {...register("isPublished")}
-                    className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary/20"
-                  />
-                  <div className="flex items-center gap-2">
-                    {watch("isPublished") ? (
-                      <MdVisibility className="text-green-600" size={20} />
-                    ) : (
-                      <MdVisibilityOff className="text-gray-400" size={20} />
+                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                  <Controller
+                    control={control}
+                    name="isPublished"
+                    render={({ field }) => (
+                      <CustomCheckbox
+                        checked={field.value}
+                        onChange={field.onChange}
+                        label={
+                          <div className="flex items-center gap-2">
+                            {watch("isPublished") ? (
+                              <MdVisibility className="text-green-600" size={20} />
+                            ) : (
+                              <MdVisibilityOff className="text-gray-400" size={20} />
+                            )}
+                            <div>
+                              <div className="font-medium text-gray-900">Publish Page</div>
+                              <div className="text-sm text-gray-600">
+                                Make this page visible on your public portfolio
+                              </div>
+                            </div>
+                          </div>
+                        }
+                      />
                     )}
-                    <div>
-                      <div className="font-medium text-gray-900">Publish Page</div>
-                      <div className="text-sm text-gray-600">
-                        Make this page visible on your public portfolio
-                      </div>
-                    </div>
-                  </div>
-                </label>
+                  />
+                </div>
 
                 {/* Password Protection */}
                 {canPasswordProtected && (
-                  <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      {...register("isPasswordProtected")}
-                      className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary/20"
-                    />
-                    <div className="flex items-center gap-2">
-                      {watch("isPasswordProtected") ? (
-                        <MdLock className="text-orange-600" size={20} />
-                      ) : (
-                        <MdPublic className="text-gray-400" size={20} />
+                  <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <Controller
+                      control={control}
+                      name="isPasswordProtected"
+                      render={({ field }) => (
+                        <CustomCheckbox
+                          checked={field.value}
+                          onChange={field.onChange}
+                          label={
+                            <div className="flex items-center gap-2">
+                              {watch("isPasswordProtected") ? (
+                                <MdLock className="text-orange-600" size={20} />
+                              ) : (
+                                <MdPublic className="text-gray-400" size={20} />
+                              )}
+                              <div>
+                                <div className="font-medium text-gray-900">Password Protection</div>
+                                <div className="text-sm text-gray-600">
+                                  Require a password to view this page
+                                </div>
+                              </div>
+                            </div>
+                          }
+                        />
                       )}
-                      <div>
-                        <div className="font-medium text-gray-900">Password Protection</div>
-                        <div className="text-sm text-gray-600">
-                          Require a password to view this page
-                        </div>
-                      </div>
-                    </div>
-                  </label>
+                    />
+                  </div>
                 )}
 
                 {!canPasswordProtected && (
@@ -357,6 +376,7 @@ export default function PageEditor({
             </div>
           </div>
         </form>
+        </CustomScrollbar>
       </motion.div>
     </motion.div>
   );

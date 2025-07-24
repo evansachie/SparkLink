@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import {
   MdNotificationsNone,
-  MdAccountCircle,
   MdSearch,
   MdKeyboardArrowDown,
   MdLogout,
@@ -189,15 +188,26 @@ export default function Header() {
               whileTap={{ scale: 0.98 }}
             >
               {avatarSrc ? (
-                <motion.img
-                  src={avatarSrc}
-                  alt="User"
-                  className="w-9 h-9 rounded-full object-cover border-2 border-gray-200 group-hover:border-primary/30 transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                />
+                <div className="relative">
+                  <motion.img
+                    src={avatarSrc}
+                    alt="User"
+                    className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm group-hover:border-primary/30 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                  />
+                  <motion.div 
+                    className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-white" 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                  />
+                </div>
               ) : (
-                <motion.div whileHover={{ scale: 1.05 }}>
-                  <MdAccountCircle className="w-9 h-9 text-gray-400 group-hover:text-primary transition-colors" />
+                <motion.div 
+                  whileHover={{ scale: 1.05 }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-primary/80 to-primary text-white shadow-sm border-2 border-white"
+                >
+                  <span className="font-semibold">{displayName.charAt(0).toUpperCase()}</span>
                 </motion.div>
               )}
               <div className="hidden sm:block text-left">

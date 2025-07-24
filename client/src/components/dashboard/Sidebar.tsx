@@ -237,6 +237,7 @@ export default function Sidebar() {
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.2, delay: 0.1 }}
               className="flex items-center justify-center p-2 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors"
+              style={{ minWidth: "40px", minHeight: "40px" }}
               whileHover={{ scale: 1.1 }}
               title={`${displayName} (${userSubscription} Plan)`}
             >
@@ -245,9 +246,10 @@ export default function Sidebar() {
                   src={avatarSrc}
                   alt="User"
                   className="w-8 h-8 rounded-full object-cover border-2 border-primary/30"
+                  style={{ minWidth: "32px", minHeight: "32px", aspectRatio: "1/1" }}
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center" style={{ minWidth: "32px", minHeight: "32px" }}>
                   <span className="text-white font-semibold text-xs">
                     {displayName.charAt(0).toUpperCase()}
                   </span>

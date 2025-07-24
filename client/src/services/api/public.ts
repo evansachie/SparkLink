@@ -69,8 +69,8 @@ export interface PagePasswordResponse {
 }
 
 export const getPublicProfile = async (username: string): Promise<PublicProfile> => {
-  const response = await axios.get(`${API_URL}/public/profile/${username}`);
-  return response.data.data.profile;
+  const response = await axios.get(`${API_URL}/public/${username}`);
+  return response.data.data;
 };
 
 export const getPublicPages = async (username: string): Promise<{ pages: PublicPage[] }> => {
@@ -92,10 +92,10 @@ export const verifyPagePassword = async (
   data: PagePasswordPayload
 ): Promise<PagePasswordResponse> => {
   const response = await axios.post(
-    `${API_URL}/public/${username}/pages/${slug}/password`,
-    data
+    `${API_URL}/public/access-protected`,
+    { ...data, username, slug }
   );
-  return response.data.data;
+  return response.data;
 };
 
 export const getPublicGallery = async (
