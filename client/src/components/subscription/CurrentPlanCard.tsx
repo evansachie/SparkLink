@@ -82,7 +82,9 @@ export default function CurrentPlanCard({ subscription, onUpdate }: CurrentPlanC
             <div>
               <h3 className="font-medium text-gray-900 mb-1">Next Billing</h3>
               <p className="text-sm text-gray-600">
-                {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                {subscription.currentPeriodEnd 
+                  ? new Date(subscription.currentPeriodEnd).toLocaleDateString() 
+                  : 'Not available'}
               </p>
             </div>
           </div>

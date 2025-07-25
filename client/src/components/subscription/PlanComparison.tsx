@@ -48,7 +48,7 @@ export default function PlanComparison({
       }));
 
       // Redirect to Paystack payment page
-      window.location.href = response.paymentUrl;
+      window.location.href = response.authorizationUrl;
     } catch {
       error("Failed to initialize payment");
     } finally {

@@ -9,7 +9,6 @@ import {
 import SubscriptionHeader from "../../components/subscription/SubscriptionHeader";
 import PlanComparison from "../../components/subscription/PlanComparison";
 import CurrentPlanCard from "../../components/subscription/CurrentPlanCard";
-import BillingHistory from "../../components/subscription/BillingHistory";
 import {ErrorBoundary} from "../../components/common/ErrorBoundary";
 
 export default function SubscriptionPage() {
@@ -165,9 +164,6 @@ export default function SubscriptionPage() {
         />
       </ErrorBoundary>
       
-      {currentSubscription && (
-        <BillingHistory subscriptionId={currentSubscription.id} />
-      )}
     </div>
   );
 }

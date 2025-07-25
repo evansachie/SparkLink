@@ -42,10 +42,9 @@ export interface InitializeSubscriptionPayload {
 }
 
 export interface InitializeSubscriptionResponse {
-  subscriptionId: string;
-  clientSecret: string;
-  paymentUrl: string;
+  authorizationUrl: string;
   reference: string;
+  accessCode: string;
 }
 
 export interface VerifySubscriptionResponse {
@@ -64,7 +63,22 @@ export const getCurrentSubscription = async (): Promise<CurrentSubscription | nu
     const response = await axios.get(`${API_URL}/subscriptions/current`, {
       headers: getAuthHeaders(),
     });
-    return response.data.data;
+    
+    const data = response.data.data;
+    if (!data) return null;
+    
+    // Construct a proper CurrentSubscription from the data
+    const currentSubscription: CurrentSubscription = {
+      id: data.id || data.subscriptionData?.transactionRef || '',
+      tier: data.currentPlan,
+      status: data.subscriptionData?.status || 'pending',
+      currentPeriodStart: data.subscriptionData?.startDate || new Date().toISOString(),
+      currentPeriodEnd: data.expiresAt || '',
+      cancelAtPeriodEnd: false,
+      plan: data.planDetails || null
+    };
+    
+    return currentSubscription;
   } catch (error) {
     // Return null if no subscription found
     if (axios.isAxiosError(error) && error.response?.status === 404) {
