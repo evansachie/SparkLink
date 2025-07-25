@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { MdClose, MdCloudUpload } from "react-icons/md";
+import { MdCloudUpload } from "react-icons/md";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { Modal } from "../common/Modal";
 import { CreateGalleryItemPayload } from "../../services/api/gallery";
 
 interface GalleryUploadModalProps {
@@ -75,24 +75,14 @@ export function GalleryUploadModal({ isOpen, onClose, onUpload, uploading }: Gal
     setTags("");
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
-      >
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">Upload Image</h2>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <MdClose size={20} />
-          </Button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      title="Upload Image"
+      size="md"
+    >
+      <form onSubmit={handleSubmit} className="p-4 space-y-4">
           {/* File Upload Area */}
           <div
             className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
@@ -189,8 +179,7 @@ export function GalleryUploadModal({ isOpen, onClose, onUpload, uploading }: Gal
             </Button>
           </div>
         </form>
-      </motion.div>
-    </div>
+    </Modal>
   );
 }
 

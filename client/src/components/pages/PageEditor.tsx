@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion, AnimatePresence } from "framer-motion";
 import {
-  MdClose,
   MdSave,
   MdLock,
   MdPublic,
@@ -17,6 +15,7 @@ import Button from "../common/Button";
 import { Page, PageType } from "../../types/api";
 import { CustomCheckbox } from "../ui/custom-checkbox";
 import { CustomScrollbar } from "../ui/custom-scrollbar";
+import { Modal } from "../common/Modal";
 
 interface PageEditorProps {
   page?: Page | null;
@@ -141,38 +140,24 @@ export default function PageEditor({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-8 overflow-auto bg-black/50 backdrop-blur-sm"
-      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      size="xl"
+      className="p-0"
     >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden relative my-8"
-      >
-        <CustomScrollbar className="max-h-[calc(90vh-20px)] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              {page ? "Edit Page" : "Create New Page"}
-            </h2>
-            <p className="text-gray-600 mt-1">
-              {page ? "Update your page content and settings" : "Create a new page for your portfolio"}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <MdClose size={24} />
-          </button>
+      <CustomScrollbar className="max-h-[calc(90vh-20px)] overflow-y-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">
+            {page ? "Edit Page" : "Create New Page"}
+          </h2>
+          <p className="text-gray-600 mt-1">
+            {page ? "Update your page content and settings" : "Create a new page for your portfolio"}
+          </p>
         </div>
+      </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full">
@@ -328,25 +313,19 @@ export default function PageEditor({
               </div>
 
               {/* Password Field */}
-              <AnimatePresence>
-                {showPasswordField && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                  >
-                    <Input
-                      label="Page Password"
-                      type="password"
-                      placeholder="Enter a password for this page"
-                      error={errors.password?.message}
-                      {...register("password", {
-                        required: watchPasswordProtected ? "Password is required when protection is enabled" : false
-                      })}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {showPasswordField && (
+                <div className="transition-all duration-200 ease-in-out">
+                  <Input
+                    label="Page Password"
+                    type="password"
+                    placeholder="Enter a password for this page"
+                    error={errors.password?.message}
+                    {...register("password", {
+                      required: watchPasswordProtected ? "Password is required when protection is enabled" : false
+                    })}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -377,7 +356,6 @@ export default function PageEditor({
           </div>
         </form>
         </CustomScrollbar>
-      </motion.div>
-    </motion.div>
+    </Modal>
   );
 }
