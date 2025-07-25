@@ -72,8 +72,8 @@ export default function CurrentPlanCard({ subscription, onUpdate }: CurrentPlanC
             <div>
               <h3 className="font-medium text-gray-900 mb-1">Price</h3>
               <p className="text-lg font-semibold text-gray-900">
-                {subscription.plan?.price 
-                  ? `₦${subscription.plan.price.toLocaleString()}/${subscription.plan.interval}`
+                {subscription.plan?.monthlyPrice 
+                  ? `₵${subscription.plan.monthlyPrice.toLocaleString()}/monthly`
                   : 'Not available'
                 }
               </p>

@@ -26,36 +26,38 @@ export default function BillingHistory({ subscriptionId }: BillingHistoryProps) 
     const loadBillingHistory = async () => {
       try {
         setLoading(true);
-        // TODO: Replace with actual API call
-        // const response = await getBillingHistory(subscriptionId);
-        // setTransactions(response.transactions);
-        
-        // Mock data for now
-        setTransactions([
-          {
-            id: "1",
-            amount: 15000,
-            status: "completed",
-            date: new Date().toISOString(),
-            description: "RISE Plan - Monthly"
-          },
-          {
-            id: "2",
-            amount: 15000,
-            status: "completed",
-            date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-            description: "RISE Plan - Monthly"
-          }
-        ]);
+        // TODO: Replace with actual API call once implemented on the backend
+        // For now we'll use mock data but set a timeout to simulate a real API call
+        setTimeout(() => {
+          setTransactions([
+            {
+              id: "1",
+              amount: 35,
+              status: "completed",
+              date: new Date().toISOString(),
+              description: "RISE Plan - Monthly"
+            },
+            {
+              id: "2",
+              amount: 35,
+              status: "completed",
+              date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+              description: "RISE Plan - Monthly"
+            }
+          ]);
+          setLoading(false);
+        }, 1000);
       } catch {
         error("Failed to load billing history");
-      } finally {
         setLoading(false);
       }
     };
 
     if (subscriptionId) {
       loadBillingHistory();
+    } else {
+      // No subscription ID means we don't have payment history
+      setLoading(false);
     }
   }, [subscriptionId, error]);
 
@@ -81,32 +83,20 @@ export default function BillingHistory({ subscriptionId }: BillingHistoryProps) 
     }
   };
 
-  if (loading) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <MdHistory className="text-primary" size={24} />
-            <h2 className="text-xl font-semibold">Billing History</h2>
-          </div>
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="text-gray-600 mt-2">Loading billing history...</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <CardContent className="p-6">
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-4">
           <MdHistory className="text-primary" size={24} />
           <h2 className="text-xl font-semibold">Billing History</h2>
         </div>
 
-        {transactions.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="text-gray-600 mt-2">Loading billing history...</p>
+          </div>
+        ) : transactions.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-600">No transactions found</p>
           </div>
@@ -132,7 +122,7 @@ export default function BillingHistory({ subscriptionId }: BillingHistoryProps) 
                     {transaction.status}
                   </span>
                   <p className="font-semibold text-gray-900">
-                    ₦{transaction.amount.toLocaleString()}
+                    ₵{transaction.amount.toLocaleString()}
                   </p>
                   {transaction.invoiceUrl && transaction.status === 'completed' && (
                     <Button
