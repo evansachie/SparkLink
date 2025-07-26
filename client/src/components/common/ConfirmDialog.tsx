@@ -1,8 +1,7 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { useEffect } from "react";
 import { MdWarning, MdError, MdInfo } from "react-icons/md";
 import Button from "./Button";
 import { getConfirmButtonVariant } from "../../utils/getConfirmButtonVariant";
+import { Modal } from "./Modal";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -28,16 +27,6 @@ export default function ConfirmDialog({
   type = "warning"
 }: ConfirmDialogProps) {
   
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add('modal-open');
-      return () => {
-        document.body.classList.remove('modal-open');
-      };
-    }
-  }, [isOpen]);
-  
   const getIcon = () => {
     switch (type) {
       case "danger":
@@ -50,57 +39,48 @@ export default function ConfirmDialog({
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={(e) => e.target === e.currentTarget && !loading && onCancel()}
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6"
-          >
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 mt-1">
-                {getIcon()}
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {title}
-                </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {message}
-                </p>
-              </div>
-            </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onCancel}
+      size="md"
+      showCloseButton={false}
+    >
+      <div className="p-4">
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0 mt-1">
+            {getIcon()}
+          </div>
+          
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              {title}
+            </h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              {message}
+            </p>
+          </div>
+        </div>
 
-            <div className="flex items-center justify-end gap-3 mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={loading}
-              >
-                {cancelText}
-              </Button>
-              
-              <button
-                onClick={onConfirm}
-                disabled={loading}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${getConfirmButtonVariant()}`}
-              >
-                {loading ? "Loading..." : confirmText}
-              </button>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        <div className="flex items-center justify-end gap-3 mt-6">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={loading}
+            className="min-w-[100px]"
+          >
+            {cancelText}
+          </Button>
+          
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap ${getConfirmButtonVariant(type)}`}
+          >
+            {loading ? "Loading..." : confirmText}
+          </button>
+        </div>
+      </div>
+    </Modal>
   );
 }
