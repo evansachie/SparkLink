@@ -17,6 +17,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSubscription } from "../../hooks/useSubscription";
 
 const sidebarLinks = [
   {
@@ -86,6 +87,7 @@ export default function Sidebar() {
   const [open, setOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const { user, logout } = useAuth();
+  const { subscription } = useSubscription();
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -125,10 +127,11 @@ export default function Sidebar() {
       ? user.profilePicture
       : undefined;
 
-  const userSubscription =
-    user && typeof user === "object" && "subscription" in user && typeof user.subscription === "string"
+  // Get subscription tier from the API or fallback to user object or default to STARTER
+  const userSubscription = subscription?.tier || 
+    (user && typeof user === "object" && "subscription" in user && typeof user.subscription === "string"
       ? user.subscription
-      : "STARTER";
+      : "STARTER");
 
   const hasVerifiedBadge =
     user && typeof user === "object" && "hasVerifiedBadge" in user
