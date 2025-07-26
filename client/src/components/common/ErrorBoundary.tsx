@@ -1,5 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from "react";
-import { MdError, MdRefresh } from "react-icons/md";
+import { MdError, MdHome } from "react-icons/md";
 
 interface Props {
   children: ReactNode;
@@ -26,9 +26,6 @@ export class ErrorBoundary extends Component<Props, State> {
     this.props.onError?.(error, errorInfo);
   }
 
-  private handleReset = () => {
-    this.setState({ hasError: false, error: undefined });
-  };
 
   public render() {
     if (this.state.hasError) {
@@ -67,11 +64,11 @@ export class ErrorBoundary extends Component<Props, State> {
              
               <div className="flex gap-3 justify-center">
                 <button
-                  onClick={this.handleReset}
+                  onClick={() => window.location.href = '/'}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                 >
-                  <MdRefresh className="h-4 w-4 mr-2" />
-                  Try again
+                  <MdHome className="h-4 w-4 mr-2" />
+                  Go Home
                 </button>
                
                 <button

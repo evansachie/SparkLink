@@ -2,14 +2,13 @@ import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion, AnimatePresence } from "framer-motion";
 import {
-  MdClose,
   MdSave,
   MdLock,
   MdPublic,
   MdVisibility,
   MdVisibilityOff,
+  MdClose,
 } from "react-icons/md";
 import { CreatePagePayload, UpdatePagePayload } from "../../services/api/pages";
 import Input from "../common/Input";
@@ -17,6 +16,7 @@ import Button from "../common/Button";
 import { Page, PageType } from "../../types/api";
 import { CustomCheckbox } from "../ui/custom-checkbox";
 import { CustomScrollbar } from "../ui/custom-scrollbar";
+import { Modal } from "../common/Modal";
 
 interface PageEditorProps {
   page?: Page | null;
@@ -141,23 +141,15 @@ export default function PageEditor({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-8 overflow-auto bg-black/50 backdrop-blur-sm"
-      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      size="5xl"
+      className="p-0 overflow-hidden"
     >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden relative my-8"
-      >
-        <CustomScrollbar className="max-h-[calc(90vh-20px)] overflow-y-auto">
+      <div className="flex flex-col h-full max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white shrink-0">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
               {page ? "Edit Page" : "Create New Page"}
@@ -168,143 +160,127 @@ export default function PageEditor({
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            disabled={loading}
           >
-            <MdClose size={24} />
+            <MdClose size={24} className="text-gray-500" />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* Basic Information */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Page Type
-                </label>
-                <select
-                  {...register("type")}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30"
-                >
-                  {pageTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label} - {type.description}
-                    </option>
-                  ))}
-                </select>
-                {errors.type && (
-                  <p className="text-red-600 text-sm mt-1">{errors.type.message}</p>
-                )}
-              </div>
-
-              <Input
-                label="Page Title"
-                placeholder="About Me"
-                error={errors.title?.message}
-                {...register("title")}
-              />
-            </div>
-
-            <div>
-              <Input
-                label="URL Slug"
-                placeholder="about-me"
-                error={errors.slug?.message}
-                {...register("slug")}
-              />
-              <p className="text-xs text-gray-500 mt-1">This will be part of your page URL</p>
-            </div>
-
-            {/* Content */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Page Content</h3>
-              
-              <Input
-                label="Headline (Optional)"
-                placeholder="Welcome to my portfolio"
-                error={errors.headline?.message}
-                {...register("headline")}
-              />
-
-              <Input
-                label="Subheading (Optional)"
-                placeholder="I'm a creative professional passionate about..."
-                error={errors.subheading?.message}
-                {...register("subheading")}
-              />
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Content (Optional)
-                </label>
-                <textarea
-                  {...register("content")}
-                  rows={8}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 resize-none"
-                  placeholder="Write your page content here..."
-                />
-                {errors.content && (
-                  <p className="text-red-600 text-sm mt-1">{errors.content.message}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Settings */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Page Settings</h3>
-              
-              <div className="space-y-3">
-                {/* Publish Setting */}
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <Controller
-                    control={control}
-                    name="isPublished"
-                    render={({ field }) => (
-                      <CustomCheckbox
-                        checked={field.value}
-                        onChange={field.onChange}
-                        label={
-                          <div className="flex items-center gap-2">
-                            {watch("isPublished") ? (
-                              <MdVisibility className="text-green-600" size={20} />
-                            ) : (
-                              <MdVisibilityOff className="text-gray-400" size={20} />
-                            )}
-                            <div>
-                              <div className="font-medium text-gray-900">Publish Page</div>
-                              <div className="text-sm text-gray-600">
-                                Make this page visible on your public portfolio
-                              </div>
-                            </div>
-                          </div>
-                        }
-                      />
+        {/* Form Content with Custom Scrollbar */}
+        <CustomScrollbar className="flex-1 min-h-0">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full">
+            <div className="flex-1 p-6 space-y-8">
+              {/* Basic Information */}
+              <div className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Page Type
+                    </label>
+                    <select
+                      {...register("type")}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors duration-200 bg-white"
+                    >
+                      {pageTypes.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label} - {type.description}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.type && (
+                      <p className="text-red-600 text-sm mt-1">{errors.type.message}</p>
                     )}
+                  </div>
+
+                  <Input
+                    label="Page Title"
+                    placeholder="About Me"
+                    error={errors.title?.message}
+                    {...register("title")}
                   />
                 </div>
 
-                {/* Password Protection */}
-                {canPasswordProtected && (
-                  <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                <div>
+                  <Input
+                    label="URL Slug"
+                    placeholder="about-me"
+                    error={errors.slug?.message}
+                    {...register("slug")}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">This will be part of your page URL</p>
+                </div>
+              </div>
+
+              {/* Content Section */}
+              <div className="space-y-6">
+                <div className="border-b border-gray-200 pb-2">
+                  <h3 className="text-lg font-semibold text-gray-900">Page Content</h3>
+                  <p className="text-sm text-gray-600 mt-1">Add your page content and structure</p>
+                </div>
+                
+                <Input
+                  label="Headline (Optional)"
+                  placeholder="Welcome to my portfolio"
+                  error={errors.headline?.message}
+                  {...register("headline")}
+                />
+
+                <Input
+                  label="Subheading (Optional)"
+                  placeholder="I'm a creative professional passionate about..."
+                  error={errors.subheading?.message}
+                  {...register("subheading")}
+                />
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Content (Optional)
+                  </label>
+                  <textarea
+                    {...register("content")}
+                    rows={8}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none transition-colors duration-200"
+                    placeholder="Write your page content here..."
+                  />
+                  {errors.content && (
+                    <p className="text-red-600 text-sm mt-1">{errors.content.message}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Settings Section */}
+              <div className="space-y-6">
+                <div className="border-b border-gray-200 pb-2">
+                  <h3 className="text-lg font-semibold text-gray-900">Page Settings</h3>
+                  <p className="text-sm text-gray-600 mt-1">Configure page visibility and access</p>
+                </div>
+                
+                <div className="space-y-4">
+                  {/* Publish Setting */}
+                  <div className="p-4 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors duration-200">
                     <Controller
                       control={control}
-                      name="isPasswordProtected"
+                      name="isPublished"
                       render={({ field }) => (
                         <CustomCheckbox
                           checked={field.value}
                           onChange={field.onChange}
                           label={
-                            <div className="flex items-center gap-2">
-                              {watch("isPasswordProtected") ? (
-                                <MdLock className="text-orange-600" size={20} />
+                            <div className="flex items-center gap-3">
+                              {watch("isPublished") ? (
+                                <div className="p-2 bg-green-100 rounded-lg">
+                                  <MdVisibility className="text-green-600" size={20} />
+                                </div>
                               ) : (
-                                <MdPublic className="text-gray-400" size={20} />
+                                <div className="p-2 bg-gray-100 rounded-lg">
+                                  <MdVisibilityOff className="text-gray-400" size={20} />
+                                </div>
                               )}
                               <div>
-                                <div className="font-medium text-gray-900">Password Protection</div>
+                                <div className="font-medium text-gray-900">Publish Page</div>
                                 <div className="text-sm text-gray-600">
-                                  Require a password to view this page
+                                  Make this page visible on your public portfolio
                                 </div>
                               </div>
                             </div>
@@ -313,71 +289,114 @@ export default function PageEditor({
                       )}
                     />
                   </div>
-                )}
 
-                {!canPasswordProtected && (
-                  <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                    <div className="flex items-center gap-2 text-orange-700">
-                      <MdLock size={16} />
-                      <span className="text-sm font-medium">
-                        Password protection requires a RISE or BLAZE subscription
-                      </span>
+                  {/* Password Protection */}
+                  {canPasswordProtected && (
+                    <div className="p-4 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors duration-200">
+                      <Controller
+                        control={control}
+                        name="isPasswordProtected"
+                        render={({ field }) => (
+                          <CustomCheckbox
+                            checked={field.value}
+                            onChange={field.onChange}
+                            label={
+                              <div className="flex items-center gap-3">
+                                {watch("isPasswordProtected") ? (
+                                  <div className="p-2 bg-orange-100 rounded-lg">
+                                    <MdLock className="text-orange-600" size={20} />
+                                  </div>
+                                ) : (
+                                  <div className="p-2 bg-gray-100 rounded-lg">
+                                    <MdPublic className="text-gray-400" size={20} />
+                                  </div>
+                                )}
+                                <div>
+                                  <div className="font-medium text-gray-900">Password Protection</div>
+                                  <div className="text-sm text-gray-600">
+                                    Require a password to view this page
+                                  </div>
+                                </div>
+                              </div>
+                            }
+                          />
+                        )}
+                      />
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
 
-              {/* Password Field */}
-              <AnimatePresence>
+                  {!canPasswordProtected && (
+                    <div className="p-4 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl">
+                      <div className="flex items-center gap-3 text-orange-700">
+                        <div className="p-2 bg-orange-100 rounded-lg">
+                          <MdLock size={16} />
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium">
+                            Password protection requires a RISE or BLAZE subscription
+                          </span>
+                          <p className="text-xs text-orange-600 mt-1">
+                            Upgrade to unlock this premium feature
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Password Field */}
                 {showPasswordField && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                  >
+                  <div className="transition-all duration-300 ease-in-out transform">
                     <Input
                       label="Page Password"
                       type="password"
-                      placeholder="Enter a password for this page"
+                      placeholder="Enter a secure password for this page"
                       error={errors.password?.message}
                       {...register("password", {
                         required: watchPasswordProtected ? "Password is required when protection is enabled" : false
                       })}
                     />
-                  </motion.div>
+                  </div>
                 )}
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="p-6 border-t border-gray-200 bg-gray-50">
-            <div className="flex items-center justify-between">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                disabled={loading}
-              >
-                Cancel
-              </Button>
-              
-              <div className="flex items-center gap-3">
-                <Button
-                  type="submit"
-                  loading={loading}
-                  disabled={!isDirty && !page}
-                  className="flex items-center gap-2"
-                >
-                  <MdSave size={20} />
-                  {loading ? "Saving..." : page ? "Update Page" : "Create Page"}
-                </Button>
               </div>
             </div>
-          </div>
-        </form>
+
+            {/* Fixed Footer */}
+            <div className="p-6 border-t border-gray-200 bg-white shrink-0">
+              <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  disabled={loading}
+                  className="px-6 py-2.5 text-gray-700 font-medium border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                
+                <div className="flex items-center gap-3">
+                  <Button
+                    type="submit"
+                    disabled={(!isDirty && !page) || loading}
+                    className="px-8 py-2.5 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2 min-w-[140px] justify-center"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <MdSave size={18} />
+                        <span>{page ? "Update Page" : "Create Page"}</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </form>
         </CustomScrollbar>
-      </motion.div>
-    </motion.div>
+      </div>
+    </Modal>
   );
 }

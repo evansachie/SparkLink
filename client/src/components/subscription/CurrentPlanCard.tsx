@@ -72,8 +72,8 @@ export default function CurrentPlanCard({ subscription, onUpdate }: CurrentPlanC
             <div>
               <h3 className="font-medium text-gray-900 mb-1">Price</h3>
               <p className="text-lg font-semibold text-gray-900">
-                {subscription.plan?.price 
-                  ? `₦${subscription.plan.price.toLocaleString()}/${subscription.plan.interval}`
+                {subscription.plan?.monthlyPrice 
+                  ? `₵${subscription.plan.monthlyPrice.toLocaleString()}/monthly`
                   : 'Not available'
                 }
               </p>
@@ -82,12 +82,14 @@ export default function CurrentPlanCard({ subscription, onUpdate }: CurrentPlanC
             <div>
               <h3 className="font-medium text-gray-900 mb-1">Next Billing</h3>
               <p className="text-sm text-gray-600">
-                {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                {subscription.currentPeriodEnd 
+                  ? new Date(subscription.currentPeriodEnd).toLocaleDateString() 
+                  : 'Not available'}
               </p>
             </div>
           </div>
 
-          {subscription.status === 'active' && (
+          {subscription.status === 'active' && subscription.tier !== 'STARTER' && (
             <div className="mt-6 pt-6 border-t">
               <Button
                 variant="destructive"

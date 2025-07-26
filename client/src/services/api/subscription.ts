@@ -7,20 +7,22 @@ const getAuthHeaders = () => {
 };
 
 export interface SubscriptionPlan {
-  id: string;
-  name: string;
   tier: "STARTER" | "RISE" | "BLAZE";
-  price: number;
-  currency: string;
-  interval: "monthly" | "yearly";
+  name: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
   features: string[];
   limits: {
-    pages: number;
-    storage: number; // in MB
+    pages: number | null;
+    socialLinks: number | null;
     customDomain: boolean;
+    removeSparkLinkBranding: boolean;
     analytics: boolean;
-    passwordProtection: boolean;
-    priority: boolean;
+    advancedPrivacy: boolean;
+    scheduledPublishing: boolean;
+    verifiedBadge: boolean;
+    affiliate: boolean;
+    prioritySupport: boolean;
   };
 }
 
@@ -35,15 +37,14 @@ export interface CurrentSubscription {
 }
 
 export interface InitializeSubscriptionPayload {
-  planId: string;
-  interval: "monthly" | "yearly";
+  plan: string;  // STARTER, RISE, or BLAZE
+  billingCycle: "monthly" | "yearly";
 }
 
 export interface InitializeSubscriptionResponse {
-  subscriptionId: string;
-  clientSecret: string;
-  paymentUrl: string;
+  authorizationUrl: string;
   reference: string;
+  accessCode: string;
 }
 
 export interface VerifySubscriptionResponse {
@@ -52,7 +53,7 @@ export interface VerifySubscriptionResponse {
   message: string;
 }
 
-export const getSubscriptionPlans = async (): Promise<{ plans: SubscriptionPlan[] }> => {
+export const getSubscriptionPlans = async (): Promise<{ plans: Record<string, SubscriptionPlan> }> => {
   const response = await axios.get(`${API_URL}/subscriptions/plans`);
   return response.data.data;
 };
@@ -62,7 +63,22 @@ export const getCurrentSubscription = async (): Promise<CurrentSubscription | nu
     const response = await axios.get(`${API_URL}/subscriptions/current`, {
       headers: getAuthHeaders(),
     });
-    return response.data.data;
+    
+    const data = response.data.data;
+    if (!data) return null;
+    
+    // Construct a proper CurrentSubscription from the data
+    const currentSubscription: CurrentSubscription = {
+      id: data.id || data.subscriptionData?.transactionRef || '',
+      tier: data.currentPlan,
+      status: data.subscriptionData?.status || 'pending',
+      currentPeriodStart: data.subscriptionData?.startDate || new Date().toISOString(),
+      currentPeriodEnd: data.expiresAt || '',
+      cancelAtPeriodEnd: false,
+      plan: data.planDetails || null
+    };
+    
+    return currentSubscription;
   } catch (error) {
     // Return null if no subscription found
     if (axios.isAxiosError(error) && error.response?.status === 404) {

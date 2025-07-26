@@ -269,8 +269,8 @@ export default function SettingsPage() {
                 <div>
                   <h3 className="font-medium text-gray-900">Amount</h3>
                   <p className="text-sm text-gray-600">
-                    {currentSubscription.plan?.price 
-                      ? `₦${currentSubscription.plan.price.toLocaleString()}/${currentSubscription.plan.interval}` 
+                    {currentSubscription.plan?.monthlyPrice 
+                      ? `₵${currentSubscription.plan.monthlyPrice.toLocaleString()}/monthly` 
                       : "Not available"}
                   </p>
                 </div>

@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { MdClose, MdCreditCard } from "react-icons/md";
-import { motion, AnimatePresence } from "framer-motion";
+import { MdCreditCard } from "react-icons/md";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
+import { Modal } from "../common/Modal";
 import { type SubscriptionPlan } from "../../services/api/subscription";
 
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   plan: SubscriptionPlan;
-  onInitializePayment: (interval: "monthly" | "yearly") => void;
+  onInitializePayment: (billingCycle: "monthly" | "yearly") => void;
   loading: boolean;
 }
 
@@ -22,37 +22,22 @@ export default function PaymentModal({
 }: PaymentModalProps) {
   const [selectedInterval, setSelectedInterval] = useState<"monthly" | "yearly">("monthly");
 
-  const getYearlyPrice = () => {
-    return Math.floor(plan.price * 12 * 0.8); // 20% discount for yearly
-  };
-
   const handlePayment = () => {
     onInitializePayment(selectedInterval);
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white rounded-lg shadow-xl max-w-md w-full"
-          >
-            <div className="flex items-center justify-between p-6 border-b">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <MdCreditCard className="text-primary" />
-                Subscribe to {plan.name}
-              </h3>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-600"
-                disabled={loading}
-              >
-                <MdClose size={24} />
-              </button>
-            </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="md"
+    >
+      <div className="flex items-center justify-between p-6 border-b">
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <MdCreditCard className="text-primary" />
+          Subscribe to {plan.name}
+        </h3>
+      </div>
 
             <div className="p-6 space-y-6">
               <div>
@@ -70,7 +55,7 @@ export default function PaymentModal({
                           <p className="font-medium">Monthly</p>
                           <p className="text-sm text-gray-600">Billed monthly</p>
                         </div>
-                        <p className="text-lg font-semibold">₦{plan.price.toLocaleString()}/mo</p>
+                        <p className="text-lg font-semibold">₵{plan.monthlyPrice.toLocaleString()}/mo</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -87,12 +72,12 @@ export default function PaymentModal({
                           <p className="font-medium">Yearly</p>
                           <p className="text-sm text-gray-600">Billed annually</p>
                           <span className="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                            Save 20%
+                            Save {Math.round(((plan.monthlyPrice * 12) - plan.yearlyPrice) / (plan.monthlyPrice * 12) * 100)}%
                           </span>
                         </div>
                         <div className="text-right">
-                          <p className="text-lg font-semibold">₦{Math.floor(getYearlyPrice() / 12).toLocaleString()}/mo</p>
-                          <p className="text-sm text-gray-500">₦{getYearlyPrice().toLocaleString()}/year</p>
+                          <p className="text-lg font-semibold">₵{Math.floor(plan.yearlyPrice / 12).toLocaleString()}/mo</p>
+                          <p className="text-sm text-gray-500">₵{plan.yearlyPrice.toLocaleString()}/year</p>
                         </div>
                       </div>
                     </CardContent>
@@ -130,9 +115,6 @@ export default function PaymentModal({
                 </Button>
               </div>
             </div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
+    </Modal>
   );
 }

@@ -9,12 +9,14 @@ import {
 } from "react-icons/md";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSubscription } from "../../hooks/useSubscription";
 
 export default function Header() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const { subscription } = useSubscription();
 
   const getPageTitle = () => {
     const path = location.pathname;
@@ -41,9 +43,11 @@ export default function Header() {
     ? user.email
     : "user@example.com";
 
-  const userSubscription = (user && typeof user === "object" && "subscription" in user && typeof user.subscription === "string")
-    ? user.subscription
-    : "STARTER";
+  // Get subscription tier from the API or fallback to user object or default to STARTER
+  const userSubscription = subscription?.tier || 
+    (user && typeof user === "object" && "subscription" in user && typeof user.subscription === "string"
+      ? user.subscription
+      : "STARTER");
 
   const notifications = [
     { id: 1, text: "Your profile was viewed 15 times today", time: "2h ago", unread: true },

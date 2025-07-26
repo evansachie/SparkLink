@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useToast } from "../../hooks/useToast";
 import { 
   getCurrentSubscription, 
@@ -9,13 +10,18 @@ import {
 import SubscriptionHeader from "../../components/subscription/SubscriptionHeader";
 import PlanComparison from "../../components/subscription/PlanComparison";
 import CurrentPlanCard from "../../components/subscription/CurrentPlanCard";
-import BillingHistory from "../../components/subscription/BillingHistory";
+import PaymentCallback from "../../components/subscription/PaymentCallback";
+import {ErrorBoundary} from "../../components/common/ErrorBoundary";
 
 export default function SubscriptionPage() {
   const { error } = useToast();
   const [loading, setLoading] = useState(true);
   const [currentSubscription, setCurrentSubscription] = useState<CurrentSubscription | null>(null);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [searchParams] = useSearchParams();
+  
+  // Check if user is returning from payment
+  const isPaymentReturn = searchParams.has('reference') || searchParams.has('trxref');
 
   useEffect(() => {
     const loadSubscriptionData = async () => {
@@ -28,67 +34,93 @@ export default function SubscriptionPage() {
           setCurrentSubscription(subscriptionData);
         } catch (err) {
           console.error("Failed to load current subscription:", err);
-          // Still continue to try loading plans
         }
         
         try {
           const plansResponse = await getSubscriptionPlans();
-          // Handle API response structure - the response might be { plans: [] } or just []
-          const plansData = plansResponse?.plans || plansResponse || [];
-          setPlans(Array.isArray(plansData) ? plansData : []);
+          const plansData = plansResponse?.plans || {};
+          
+          // Convert the object to an array of plans
+          const plansArray = Object.entries(plansData).map(([key, plan]) => ({
+            ...plan,
+            tier: key as "STARTER" | "RISE" | "BLAZE",
+          }));
+          
+          setPlans(plansArray as SubscriptionPlan[]);
           
           // fallback default plans
-          if (!plansData.length) {
+          if (!plansArray.length) {
             setPlans([
               {
-                id: "starter",
-                name: "STARTER",
-                tier: "STARTER",
-                price: 0,
-                currency: "NGN",
-                interval: "monthly",
-                features: ["Basic Portfolio", "1 Custom Page", "Limited Storage"],
+                tier: "STARTER" as const,
+                name: "Starter",
+                monthlyPrice: 0,
+                yearlyPrice: 0,
+                features: [
+                  "1-page portfolio (Home default)",
+                  "SparkLink-branded URL",
+                  "3 professional templates",
+                  "Customizable profile picture and banner"
+                ],
                 limits: {
                   pages: 1,
-                  storage: 100,
+                  socialLinks: 5,
                   customDomain: false,
+                  removeSparkLinkBranding: false,
                   analytics: false,
-                  passwordProtection: false,
-                  priority: false
+                  advancedPrivacy: false,
+                  scheduledPublishing: false,
+                  verifiedBadge: false,
+                  affiliate: false,
+                  prioritySupport: false
                 }
               },
               {
-                id: "rise",
-                name: "RISE",
                 tier: "RISE",
-                price: 15000,
-                currency: "NGN",
-                interval: "monthly",
-                features: ["Enhanced Portfolio", "5 Custom Pages", "Expanded Storage", "Basic Analytics"],
+                name: "Rise",
+                monthlyPrice: 35,
+                yearlyPrice: 350,
+                features: [
+                  "Up to 6 total pages",
+                  "10 standard templates",
+                  "Analytics dashboard",
+                  "Option to remove SparkLink branding"
+                ],
                 limits: {
-                  pages: 5,
-                  storage: 500,
+                  pages: 6,
+                  socialLinks: 10,
                   customDomain: false,
+                  removeSparkLinkBranding: true,
                   analytics: true,
-                  passwordProtection: false,
-                  priority: false
+                  advancedPrivacy: false,
+                  scheduledPublishing: false,
+                  verifiedBadge: false,
+                  affiliate: false,
+                  prioritySupport: false
                 }
               },
               {
-                id: "blaze",
-                name: "BLAZE",
                 tier: "BLAZE",
-                price: 30000,
-                currency: "NGN",
-                interval: "monthly",
-                features: ["Premium Portfolio", "Unlimited Pages", "Extensive Storage", "Advanced Analytics", "Custom Domain"],
+                name: "Blaze",
+                monthlyPrice: 70,
+                yearlyPrice: 700,
+                features: [
+                  "Unlimited pages and templates",
+                  "White-label option",
+                  "Verified badge on your profile",
+                  "Client galleries with guest uploads"
+                ],
                 limits: {
-                  pages: 999,
-                  storage: 2000,
+                  pages: null,
+                  socialLinks: null,
                   customDomain: true,
+                  removeSparkLinkBranding: true,
                   analytics: true,
-                  passwordProtection: true,
-                  priority: true
+                  advancedPrivacy: true,
+                  scheduledPublishing: true,
+                  verifiedBadge: true,
+                  affiliate: true,
+                  prioritySupport: true
                 }
               }
             ]);
@@ -123,6 +155,13 @@ export default function SubscriptionPage() {
     <div className="max-w-6xl mx-auto p-6 space-y-8">
       <SubscriptionHeader />
       
+      {/* Show payment callback UI if user is returning from payment */}
+      {isPaymentReturn && (
+        <div className="mb-8">
+          <PaymentCallback />
+        </div>
+      )}
+      
       {currentSubscription && (
         <CurrentPlanCard 
           subscription={currentSubscription}
@@ -130,15 +169,14 @@ export default function SubscriptionPage() {
         />
       )}
       
-      <PlanComparison 
-        plans={plans}
-        currentSubscription={currentSubscription}
-        onSubscriptionUpdate={setCurrentSubscription}
-      />
+      <ErrorBoundary>
+        <PlanComparison 
+          plans={plans}
+          currentSubscription={currentSubscription}
+          onSubscriptionUpdate={setCurrentSubscription}
+        />
+      </ErrorBoundary>
       
-      {currentSubscription && (
-        <BillingHistory subscriptionId={currentSubscription.id} />
-      )}
     </div>
   );
 }

@@ -30,25 +30,28 @@ export default function PlanComparison({
     setShowPaymentModal(true);
   };
 
-  const handleInitializePayment = async (interval: "monthly" | "yearly") => {
+  const handleInitializePayment = async (billingCycle: "monthly" | "yearly") => {
     if (!selectedPlan) return;
 
     try {
       setLoading(true);
       const response = await initializeSubscription({
-        planId: selectedPlan.id,
-        interval
+        plan: selectedPlan.tier,
+        billingCycle
       });
 
       // Store callback info for when user returns from payment
       localStorage.setItem('pendingSubscription', JSON.stringify({
-        planId: selectedPlan.id,
-        interval,
+        plan: selectedPlan.tier,
+        billingCycle,
         reference: response.reference
       }));
+      
+      // Store reference separately for easier access
+      localStorage.setItem('pendingSubscriptionReference', response.reference);
 
       // Redirect to Paystack payment page
-      window.location.href = response.paymentUrl;
+      window.location.href = response.authorizationUrl;
     } catch {
       error("Failed to initialize payment");
     } finally {
@@ -57,11 +60,13 @@ export default function PlanComparison({
   };
 
   const isCurrentPlan = (plan: SubscriptionPlan) => {
-    return currentSubscription?.plan.id === plan.id;
+    if (!currentSubscription) return false;
+    if (!currentSubscription.plan) return false;
+    return currentSubscription.plan.tier === plan.tier;
   };
 
   const getPopularPlan = () => {
-    return safePlans.find(plan => plan.tier === 'RISE');
+    return safePlans.find(plan => plan && plan.tier === 'RISE');
   };
 
   // Show loading state if no plans
@@ -80,16 +85,24 @@ export default function PlanComparison({
         <h2 className="text-2xl font-bold text-center mb-8">Choose Your Plan</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {safePlans.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              isCurrentPlan={isCurrentPlan(plan)}
-              isPopular={plan.id === getPopularPlan()?.id}
-              onSelectPlan={handleSelectPlan}
-              loading={loading}
-            />
-          ))}
+          {safePlans.map((plan) => {
+            // Skip any invalid plans
+            if (!plan || !plan.tier) return null;
+            
+            const popularPlan = getPopularPlan();
+            const isPopular = popularPlan ? plan.tier === popularPlan.tier : false;
+            
+            return (
+              <PlanCard
+                key={plan.tier}
+                plan={plan}
+                isCurrentPlan={isCurrentPlan(plan)}
+                isPopular={isPopular}
+                onSelectPlan={handleSelectPlan}
+                loading={loading}
+              />
+            );
+          })}
         </div>
       </div>
 

@@ -17,6 +17,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSubscription } from "../../hooks/useSubscription";
 
 const sidebarLinks = [
   {
@@ -56,29 +57,29 @@ const sidebarLinks = [
     description: "Plans & billing",
   },
   {
-    to: "/dashboard/settings",
-    label: "Settings",
-    icon: <MdSettings size={22} />,
-    description: "Account preferences",
-  },
-  {
-    to: "/dashboard/templates",
-    label: "Templates",
-    icon: <MdPages size={22} />,
-    description: "Design templates",
-  },
-  {
     to: "/dashboard/resume",
     label: "Resume",
     icon: <MdPerson size={22} />,
     description: "Create & manage resume",
   },
   {
-    to: "/dashboard/verification",
-    label: "Verification",
-    icon: <MdVerified size={22} />,
-    description: "Verify your identity",
+    to: "/dashboard/settings",
+    label: "Settings",
+    icon: <MdSettings size={22} />,
+    description: "Account preferences",
   },
+  // {
+  //   to: "/dashboard/templates",
+  //   label: "Templates",
+  //   icon: <MdPages size={22} />,
+  //   description: "Design templates",
+  // },
+  // {
+  //   to: "/dashboard/verification",
+  //   label: "Verification",
+  //   icon: <MdVerified size={22} />,
+  //   description: "Verify your identity",
+  // },
 ];
 
 export default function Sidebar() {
@@ -86,6 +87,7 @@ export default function Sidebar() {
   const [open, setOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const { user, logout } = useAuth();
+  const { subscription } = useSubscription();
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -125,10 +127,11 @@ export default function Sidebar() {
       ? user.profilePicture
       : undefined;
 
-  const userSubscription =
-    user && typeof user === "object" && "subscription" in user && typeof user.subscription === "string"
+  // Get subscription tier from the API or fallback to user object or default to STARTER
+  const userSubscription = subscription?.tier || 
+    (user && typeof user === "object" && "subscription" in user && typeof user.subscription === "string"
       ? user.subscription
-      : "STARTER";
+      : "STARTER");
 
   const hasVerifiedBadge =
     user && typeof user === "object" && "hasVerifiedBadge" in user

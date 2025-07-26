@@ -51,8 +51,8 @@ export default function PlanCard({
         <div className="text-center mb-6">
           <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
           <div className="mb-4">
-            <span className="text-4xl font-bold text-gray-900">₦{plan.price.toLocaleString()}</span>
-            <span className="text-gray-600">/{plan.interval}</span>
+            <span className="text-4xl font-bold text-gray-900">₵{plan.monthlyPrice.toLocaleString()}</span>
+            <span className="text-gray-600">/monthly</span>
           </div>
         </div>
 
@@ -68,11 +68,7 @@ export default function PlanCard({
         <div className="space-y-2 mb-6 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-600">Pages:</span>
-            <span className="font-medium">{plan.limits.pages === -1 ? 'Unlimited' : plan.limits.pages}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Storage:</span>
-            <span className="font-medium">{plan.limits.storage}MB</span>
+            <span className="font-medium">{plan.limits.pages === null ? 'Unlimited' : plan.limits.pages}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Custom Domain:</span>
