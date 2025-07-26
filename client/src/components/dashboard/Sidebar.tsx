@@ -57,6 +57,12 @@ const sidebarLinks = [
     description: "Plans & billing",
   },
   {
+    to: "/dashboard/resume",
+    label: "Resume",
+    icon: <MdPerson size={22} />,
+    description: "Create & manage resume",
+  },
+  {
     to: "/dashboard/settings",
     label: "Settings",
     icon: <MdSettings size={22} />,
@@ -68,12 +74,6 @@ const sidebarLinks = [
   //   icon: <MdPages size={22} />,
   //   description: "Design templates",
   // },
-  {
-    to: "/dashboard/resume",
-    label: "Resume",
-    icon: <MdPerson size={22} />,
-    description: "Create & manage resume",
-  },
   // {
   //   to: "/dashboard/verification",
   //   label: "Verification",
