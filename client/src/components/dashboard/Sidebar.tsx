@@ -62,12 +62,12 @@ const sidebarLinks = [
     icon: <MdSettings size={22} />,
     description: "Account preferences",
   },
-  {
-    to: "/dashboard/templates",
-    label: "Templates",
-    icon: <MdPages size={22} />,
-    description: "Design templates",
-  },
+  // {
+  //   to: "/dashboard/templates",
+  //   label: "Templates",
+  //   icon: <MdPages size={22} />,
+  //   description: "Design templates",
+  // },
   {
     to: "/dashboard/resume",
     label: "Resume",

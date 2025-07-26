@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { 
   MdCloudUpload, 
-  MdClose,
   MdDescription
 } from "react-icons/md";
 import { Button } from "../ui/button";
+import Modal from "../common/Modal";
 
 interface ResumeUploadModalProps {
   isOpen: boolean;
@@ -71,25 +70,15 @@ export default function ResumeUploadModal({
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-lg shadow-xl max-w-md w-full"
-      >
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">Upload Resume</h2>
-          <Button variant="ghost" size="sm" onClick={handleClose}>
-            <MdClose size={20} />
-          </Button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-4 space-y-4">
-          {/* File Upload Area */}
+    <Modal 
+      isOpen={isOpen} 
+      onClose={handleClose}
+      title="Upload Resume"
+      size="md"
+    >
+      <form onSubmit={handleSubmit} className="p-4 space-y-4">
+        {/* File Upload Area */}
           <div
             className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
               dragActive 
@@ -145,7 +134,6 @@ export default function ResumeUploadModal({
             </Button>
           </div>
         </form>
-      </motion.div>
-    </div>
+      </Modal>
   );
 }
