@@ -42,7 +42,7 @@ export default function PaymentCallback() {
             success("Subscription payment successful! Your plan has been updated.");
             
             // Update the subscription data through our hook
-            refreshSubscription();
+            await refreshSubscription();
             
             // Clear any pending subscription data
             localStorage.removeItem("pendingSubscription");
@@ -62,7 +62,6 @@ export default function PaymentCallback() {
     }
   }, [searchParams, success, error, refreshSubscription, navigate, isAuthenticated]);
 
-  // Don't render anything, just handle the verification
   return (
     <div className="flex items-center justify-center p-8">
       {verifying ? (
@@ -71,7 +70,11 @@ export default function PaymentCallback() {
           <p className="text-xl font-medium text-gray-900">Verifying your payment...</p>
           <p className="text-gray-600 mt-2">Please wait while we confirm your subscription.</p>
         </div>
-      ) : null}
+      ) : (
+        <div className="text-center">
+          <p className="text-gray-600">Checking subscription status...</p>
+        </div>
+      )}
     </div>
   );
 }

@@ -74,12 +74,12 @@ const sidebarLinks = [
     icon: <MdPerson size={22} />,
     description: "Create & manage resume",
   },
-  {
-    to: "/dashboard/verification",
-    label: "Verification",
-    icon: <MdVerified size={22} />,
-    description: "Verify your identity",
-  },
+  // {
+  //   to: "/dashboard/verification",
+  //   label: "Verification",
+  //   icon: <MdVerified size={22} />,
+  //   description: "Verify your identity",
+  // },
 ];
 
 export default function Sidebar() {

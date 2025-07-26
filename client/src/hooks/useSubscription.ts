@@ -7,7 +7,7 @@ import { getCurrentSubscription, type CurrentSubscription } from "../services/ap
  * This helps maintain consistent subscription data across the app
  */
 export function useSubscription() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, updateUser } = useAuth();
   const [subscription, setSubscription] = useState<CurrentSubscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -21,13 +21,8 @@ export function useSubscription() {
       
       // Update user context with current subscription tier
       if (data && user && typeof user === "object") {
-        const updatedUser = {
-          ...user,
-          subscription: data.tier
-        };
-        
-        // Update localStorage to reflect the current subscription
-        localStorage.setItem("user", JSON.stringify(updatedUser));
+        // Use the updateUser function from AuthContext to update both state and localStorage
+        updateUser({ subscription: data.tier });
       }
     } catch (err) {
       console.error("Error fetching subscription:", err);
@@ -49,10 +44,15 @@ export function useSubscription() {
     }
   }, [isAuthenticated, fetchSubscriptionRef]);
 
+  // Return an async refreshSubscription function that can be awaited
+  const refreshSubscription = async () => {
+    return await fetchSubscription();
+  };
+
   return {
     subscription,
     loading,
     error,
-    refreshSubscription: fetchSubscription
+    refreshSubscription
   };
 }

@@ -17,7 +17,7 @@ import GalleryPage from "./pages/dashboard/GalleryPage";
 import AnalyticsPage from "./pages/dashboard/AnalyticsPage";
 // import TemplatesPage from "./pages/dashboard/TemplatesPage";
 import ResumePage from "./pages/dashboard/ResumePage";
-import VerificationPage from "./pages/dashboard/VerificationPage";
+// import VerificationPage from "./pages/dashboard/VerificationPage";
 import SubscriptionPage from "./pages/dashboard/SubscriptionPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 
@@ -69,7 +69,7 @@ function App() {
                         <Route path="settings" element={<SettingsPage />} />
                         {/* <Route path="templates" element={<TemplatesPage />} />  */}
                         <Route path="resume" element={<ResumePage />} />
-                        <Route path="verification" element={<VerificationPage />} />
+                        {/* <Route path="verification" element={<VerificationPage />} /> */}
                       </Routes>
                     </DashboardLayout>
                   </ProtectedRoute>
