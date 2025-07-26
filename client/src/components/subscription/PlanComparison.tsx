@@ -46,6 +46,9 @@ export default function PlanComparison({
         billingCycle,
         reference: response.reference
       }));
+      
+      // Store reference separately for easier access
+      localStorage.setItem('pendingSubscriptionReference', response.reference);
 
       // Redirect to Paystack payment page
       window.location.href = response.authorizationUrl;

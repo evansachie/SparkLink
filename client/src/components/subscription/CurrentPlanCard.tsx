@@ -89,7 +89,7 @@ export default function CurrentPlanCard({ subscription, onUpdate }: CurrentPlanC
             </div>
           </div>
 
-          {subscription.status === 'active' && (
+          {subscription.status === 'active' && subscription.tier !== 'STARTER' && (
             <div className="mt-6 pt-6 border-t">
               <Button
                 variant="destructive"

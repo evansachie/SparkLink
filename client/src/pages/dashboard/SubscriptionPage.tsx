@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useToast } from "../../hooks/useToast";
 import { 
   getCurrentSubscription, 
@@ -9,6 +10,7 @@ import {
 import SubscriptionHeader from "../../components/subscription/SubscriptionHeader";
 import PlanComparison from "../../components/subscription/PlanComparison";
 import CurrentPlanCard from "../../components/subscription/CurrentPlanCard";
+import PaymentCallback from "../../components/subscription/PaymentCallback";
 import {ErrorBoundary} from "../../components/common/ErrorBoundary";
 
 export default function SubscriptionPage() {
@@ -16,6 +18,10 @@ export default function SubscriptionPage() {
   const [loading, setLoading] = useState(true);
   const [currentSubscription, setCurrentSubscription] = useState<CurrentSubscription | null>(null);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [searchParams] = useSearchParams();
+  
+  // Check if user is returning from payment
+  const isPaymentReturn = searchParams.has('reference') || searchParams.has('trxref');
 
   useEffect(() => {
     const loadSubscriptionData = async () => {
@@ -148,6 +154,13 @@ export default function SubscriptionPage() {
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
       <SubscriptionHeader />
+      
+      {/* Show payment callback UI if user is returning from payment */}
+      {isPaymentReturn && (
+        <div className="mb-8">
+          <PaymentCallback />
+        </div>
+      )}
       
       {currentSubscription && (
         <CurrentPlanCard 
